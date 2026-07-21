@@ -33,8 +33,7 @@ export default function AdminLoginPage() {
   return (
     <div className="center-card">
       <form className="panel" onSubmit={handleSubmit}>
-        <p className="eyebrow">Admin</p>
-        <h3 style={{ marginTop: 0, marginBottom: 16 }}>Sign in</h3>
+        <h3 style={{ marginTop: 0, marginBottom: 16 }}>Admin sign in</h3>
 
         {error && <div className="alert alert-err">{error}</div>}
 

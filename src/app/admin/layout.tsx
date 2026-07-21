@@ -50,12 +50,8 @@ export default function AdminLayout({
       <div className="admin-top">
         <div className="container bar">
           <div className="tabs">
-            <Link href="/admin/cars" className="brand" style={{ marginRight: 8 }}>
-              <span className="plate" style={{ fontSize: 14, padding: "4px 10px" }}>
-                <span className="bolt" aria-hidden="true" />
-                ADMIN
-                <span className="bolt" aria-hidden="true" />
-              </span>
+            <Link href="/admin/cars" style={{ marginRight: 8 }}>
+              <span className="admin-badge">USA Auto · Admin</span>
             </Link>
             {TABS.map((t) => (
               <Link

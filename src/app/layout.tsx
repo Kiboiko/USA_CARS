@@ -1,28 +1,21 @@
 import type { Metadata } from "next";
-import { Anton, Hanken_Grotesk, Spline_Sans_Mono } from "next/font/google";
+import { Inter, Roboto_Condensed } from "next/font/google";
 import "./globals.css";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
-// Type system (frontend-design):
-// - Anton: condensed poster face — prices, headlines, the plate wordmark.
-// - Hanken Grotesk: warm humanist body.
-// - Spline Sans Mono: window-sticker / odometer data + stamped labels.
-const display = Anton({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-display",
-  display: "swap",
-});
-const body = Hanken_Grotesk({
+// Type system — plain, readable US-dealership feel:
+// - Inter: body / UI text.
+// - Roboto Condensed: bold vehicle titles, prices, section headings.
+const body = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-body",
   display: "swap",
 });
-const mono = Spline_Sans_Mono({
+const display = Roboto_Condensed({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-mono",
+  weight: ["500", "700"],
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -56,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable}`}>
       <body>{children}</body>
     </html>
   );

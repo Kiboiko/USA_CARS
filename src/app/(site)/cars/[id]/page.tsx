@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Gallery from "@/components/Gallery";
 import LeadForm from "@/components/LeadForm";
 import { getCarServer } from "@/lib/server-api";
-import { carTitle, formatMileage, formatPrice } from "@/lib/format";
+import { carTitle, estMonthly, formatMileage, formatPrice } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -42,53 +42,91 @@ export default async function CarPage({
 
   const title = carTitle(car);
 
+  const stock = String(car.id).padStart(4, "0");
+
   return (
     <div className="container">
       <nav className="breadcrumb">
-        <Link href="/">Cars</Link> / {title}
+        <Link href="/">Inventory</Link> &nbsp;/&nbsp; Used {car.make} &nbsp;/&nbsp; {title}
       </nav>
 
       <div className="detail">
         <div>
           <Gallery photos={car.photos} alt={title} />
-          <div className="panel" style={{ marginTop: 20 }}>
-            <h2 style={{ marginTop: 0, fontSize: 18 }}>Description</h2>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="block-title">Vehicle overview</h2>
             <p className="desc">{car.description}</p>
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="block-title">Specifications</h2>
+            <div className="specs" style={{ borderRadius: "var(--radius)" }}>
+              <div className="row">
+                <span className="k">Make</span>
+                <span className="v">{car.make}</span>
+              </div>
+              <div className="row">
+                <span className="k">Model</span>
+                <span className="v">{car.model}</span>
+              </div>
+              <div className="row">
+                <span className="k">Year</span>
+                <span className="v">{car.year}</span>
+              </div>
+              <div className="row">
+                <span className="k">Mileage</span>
+                <span className="v">{formatMileage(car.mileage)}</span>
+              </div>
+              <div className="row">
+                <span className="k">Stock #</span>
+                <span className="v">{stock}</span>
+              </div>
+              <div className="row">
+                <span className="k">VIN</span>
+                <span className="v">Available on request</span>
+              </div>
+            </div>
           </div>
         </div>
 
         <div>
-          <p className="eyebrow">Stock № {String(car.id).padStart(4, "0")}</p>
-          <h1>{title}</h1>
-          <div className="price-lg">
-            <span className="cur">$</span>
-            {car.price.toLocaleString("en-US")}
+          <h1 className="vdp-title">{title}</h1>
+          <p className="vdp-sub">
+            Stock #{stock} · {formatMileage(car.mileage)} · Used
+          </p>
+
+          <div className="pricecard">
+            <div className="pc-top">
+              <div>
+                <div className="price-label">Our price</div>
+                <div className="pc-price">{formatPrice(car.price)}</div>
+              </div>
+              <div className="price-mo">
+                <b>${estMonthly(car.price).toLocaleString("en-US")}/mo</b>
+                est.*
+              </div>
+            </div>
+            <div className="pc-cta">
+              <a href="#inquiry" className="btn btn-deal btn-block">
+                Get ePrice
+              </a>
+              <a href="#inquiry" className="btn btn-primary btn-block">
+                Check availability
+              </a>
+              <a href="tel:+15551234567" className="btn btn-block">
+                ☎ Call about this car
+              </a>
+            </div>
+            <p className="pc-fine">
+              *Estimated payment: 10% down, 7.9% APR, 72 mo. On approved credit;
+              not a financing offer. Price excludes tax, title, and fees.
+            </p>
           </div>
 
-          <div className="sticker-head">
-            <span>Window sticker</span>
-            <span>VIN on request</span>
+          <div id="inquiry">
+            <LeadForm carId={car.id} carTitle={title} />
           </div>
-          <div className="specs">
-            <div className="row">
-              <span className="k">Make</span>
-              <span className="v">{car.make}</span>
-            </div>
-            <div className="row">
-              <span className="k">Model</span>
-              <span className="v">{car.model}</span>
-            </div>
-            <div className="row">
-              <span className="k">Year</span>
-              <span className="v">{car.year}</span>
-            </div>
-            <div className="row">
-              <span className="k">Odometer</span>
-              <span className="v">{formatMileage(car.mileage)}</span>
-            </div>
-          </div>
-
-          <LeadForm carId={car.id} carTitle={title} />
         </div>
       </div>
     </div>

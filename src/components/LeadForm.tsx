@@ -109,12 +109,12 @@ export default function LeadForm({
   if (status === "ok") {
     return (
       <div className="panel" role="status">
-        <p className="eyebrow">Inquiry sent</p>
         <div className="alert alert-ok" style={{ marginBottom: 14 }}>
-          Got it — we&apos;ll be in touch shortly, usually the same day.
+          Got it — we&apos;ll be in touch with pricing and availability shortly,
+          usually the same day.
         </div>
         <button className="btn" onClick={() => setStatus("idle")}>
-          Ask about another car
+          Send another request
         </button>
       </div>
     );
@@ -122,10 +122,10 @@ export default function LeadForm({
 
   return (
     <form className="panel" onSubmit={handleSubmit} noValidate>
-      <p className="eyebrow">Inquiry</p>
-      <h3>Ask about this car</h3>
+      <h3>Get your ePrice</h3>
       <p className="panel-sub">
-        Leave a phone or email and we&apos;ll get back to you — no account, no spam.
+        Send your info and we&apos;ll reply with pricing and availability — no
+        account, no spam.
       </p>
 
       {status === "error" && (
