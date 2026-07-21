@@ -1,27 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { ApiError, postLead } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { ApiError, getLeadOptions, postLead } from "@/lib/api";
+import type { LeadOption } from "@/lib/types";
 
 // Lead form with client-side validation (TZ §2.1 / §2.4). Fields per the
-// open question in §2.4 / §9: name + contact (phone or email) + message.
-// Sends to POST /api/leads.
+// updated §6 contract: name + phone + email + interest (dropdown) + message.
+// Interest options come from GET /api/lead-options; the "Select Your Interest"
+// placeholder (value "") is added here and is a valid submission.
+// Sends slug values to POST /api/leads.
 
-type Errors = Partial<Record<"name" | "contact", string>>;
+type Errors = Partial<Record<"name" | "phone" | "email", string>>;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^[+()\-\s\d]{7,}$/;
 
-function validate(name: string, contact: string): Errors {
+function validate(name: string, phone: string, email: string): Errors {
   const errors: Errors = {};
   if (name.trim().length < 2) {
     errors.name = "Please enter your name.";
   }
-  const c = contact.trim();
-  if (!c) {
-    errors.contact = "Enter a phone number or email.";
-  } else if (!EMAIL_RE.test(c) && !PHONE_RE.test(c)) {
-    errors.contact = "Enter a valid phone number or email.";
+  const p = phone.trim();
+  const e = email.trim();
+  if (!p && !e) {
+    // At least one contact method required — flag both fields.
+    errors.phone = "Enter a phone number or email.";
+    errors.email = "Enter a phone number or email.";
+  } else {
+    if (p && !PHONE_RE.test(p)) errors.phone = "Enter a valid phone number.";
+    if (e && !EMAIL_RE.test(e)) errors.email = "Enter a valid email address.";
   }
   return errors;
 }
@@ -34,10 +41,13 @@ export default function LeadForm({
   carTitle?: string;
 }) {
   const [name, setName] = useState("");
-  const [contact, setContact] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [interest, setInterest] = useState(""); // "" = Select Your Interest
   const [message, setMessage] = useState(
     carTitle ? `I'm interested in the ${carTitle}. Please contact me.` : "",
   );
+  const [options, setOptions] = useState<LeadOption[]>([]);
   const [errors, setErrors] = useState<Errors>({});
   const [touched, setTouched] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">(
@@ -45,10 +55,26 @@ export default function LeadForm({
   );
   const [serverError, setServerError] = useState("");
 
+  // Load Interest dropdown options. On failure the select still renders with
+  // just the placeholder — interest is optional, so the form stays usable.
+  useEffect(() => {
+    let active = true;
+    getLeadOptions()
+      .then((res) => {
+        if (active) setOptions(res.interests ?? []);
+      })
+      .catch(() => {
+        /* keep placeholder-only select */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setTouched(true);
-    const found = validate(name, contact);
+    const found = validate(name, phone, email);
     setErrors(found);
     if (Object.keys(found).length > 0) return;
 
@@ -58,12 +84,16 @@ export default function LeadForm({
       await postLead({
         car_id: carId,
         name: name.trim(),
-        contact: contact.trim(),
+        phone: phone.trim(),
+        email: email.trim(),
+        interest, // slug value ("" if not selected)
         message: message.trim(),
       });
       setStatus("ok");
       setName("");
-      setContact("");
+      setPhone("");
+      setEmail("");
+      setInterest("");
       setMessage("");
       setTouched(false);
     } catch (err) {
@@ -103,7 +133,7 @@ export default function LeadForm({
           id="lead-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          onBlur={() => setErrors(validate(name, contact))}
+          onBlur={() => setErrors(validate(name, phone, email))}
           placeholder="John Smith"
           autoComplete="name"
         />
@@ -112,19 +142,53 @@ export default function LeadForm({
         )}
       </div>
 
-      <div className={`field ${touched && errors.contact ? "invalid" : ""}`}>
-        <label htmlFor="lead-contact">Phone or email</label>
+      <div className={`field ${touched && errors.phone ? "invalid" : ""}`}>
+        <label htmlFor="lead-phone">Phone</label>
         <input
-          id="lead-contact"
-          value={contact}
-          onChange={(e) => setContact(e.target.value)}
-          onBlur={() => setErrors(validate(name, contact))}
-          placeholder="+1 (555) 123-4567 or you@email.com"
+          id="lead-phone"
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          onBlur={() => setErrors(validate(name, phone, email))}
+          placeholder="+1 (555) 123-4567"
           autoComplete="tel"
         />
-        {touched && errors.contact && (
-          <span className="err-text">{errors.contact}</span>
+        {touched && errors.phone && (
+          <span className="err-text">{errors.phone}</span>
         )}
+      </div>
+
+      <div className={`field ${touched && errors.email ? "invalid" : ""}`}>
+        <label htmlFor="lead-email">Email</label>
+        <input
+          id="lead-email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          onBlur={() => setErrors(validate(name, phone, email))}
+          placeholder="you@email.com"
+          autoComplete="email"
+        />
+        {touched && errors.email && (
+          <span className="err-text">{errors.email}</span>
+        )}
+      </div>
+
+      <div className="field">
+        <label htmlFor="lead-interest">Interest</label>
+        <select
+          id="lead-interest"
+          name="interest"
+          value={interest}
+          onChange={(e) => setInterest(e.target.value)}
+        >
+          <option value="">Select Your Interest</option>
+          {options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="field">

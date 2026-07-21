@@ -29,7 +29,10 @@ export interface CarDetail {
 export interface LeadInput {
   car_id: number | null;
   name: string;
-  contact: string;
+  phone: string;
+  email: string;
+  // Interest slug (option value), e.g. "buy_now". Empty string = not selected.
+  interest: string;
   message: string;
 }
 
@@ -38,9 +41,22 @@ export interface Lead {
   id: number;
   car_id: number | null;
   name: string;
-  contact: string;
+  phone: string;
+  email: string;
+  interest: string;
   message: string;
   created_at: string;
+}
+
+/** One Interest dropdown option — from GET /api/lead-options */
+export interface LeadOption {
+  value: string;
+  label: string;
+}
+
+/** GET /api/lead-options response (array lives under `interests`) */
+export interface LeadOptionsResponse {
+  interests: LeadOption[];
 }
 
 /** POST/PUT body for admin car create/update */

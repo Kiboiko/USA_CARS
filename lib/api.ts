@@ -8,6 +8,7 @@ import type {
   CarListItem,
   Lead,
   LeadInput,
+  LeadOptionsResponse,
   LoginInput,
 } from "./types";
 
@@ -65,6 +66,11 @@ export function postLead(body: LeadInput): Promise<{ ok: true }> {
     method: "POST",
     body: JSON.stringify(body),
   });
+}
+
+/** Interest dropdown options for the lead form. */
+export function getLeadOptions(): Promise<LeadOptionsResponse> {
+  return request<LeadOptionsResponse>("/api/lead-options");
 }
 
 // ---- Admin endpoints (TZ §6) ----

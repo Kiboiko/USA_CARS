@@ -28,6 +28,8 @@ npm run build && npm start
 - `/cars/[id]` — car page: photo gallery, specs, description, lead form (`GET /api/cars/:id`)
 - `/contacts`, `/privacy`, `/team` — static pages
 - Lead form with client-side validation → `POST /api/leads`
+  (name + phone + email + interest + message; Interest options from
+  `GET /api/lead-options`, "Select Your Interest" placeholder sends `""`)
 - Responsive / mobile layout
 - SEO: per-page metadata + OpenGraph, `sitemap.xml`, `robots.txt`
 

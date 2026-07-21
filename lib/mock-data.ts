@@ -6,7 +6,23 @@
 // NOTE: an in-memory store resets on server restart and is per-process —
 // fine for a mock, not a real DB. Role 1 owns persistence (TZ §3).
 
-import type { CarDetail, Lead } from "./types";
+import type { CarDetail, Lead, LeadOption } from "./types";
+
+// Interest options for the lead form. Mirrors Role 1's validation.ts
+// (source of truth); the real values come from GET /api/lead-options.
+// Order is stable. The "Select Your Interest" placeholder (value: "") is
+// NOT included here — the frontend adds it and "" is a valid submission.
+export const INTEREST_OPTIONS: LeadOption[] = [
+  { value: "buy_now", label: "Buy Now" },
+  { value: "trade_in", label: "Trade-In" },
+  { value: "finance", label: "Finance This Vehicle" },
+  { value: "lease", label: "Lease This Vehicle" },
+  { value: "test_drive", label: "Schedule a Test Drive" },
+  { value: "availability", label: "Ask About Availability" },
+];
+
+/** Valid interest slugs (empty string also accepted = not selected). */
+export const INTEREST_VALUES = new Set(INTEREST_OPTIONS.map((o) => o.value));
 
 function photo(seed: string, w = 1200, h = 800): string {
   return `https://picsum.photos/seed/${seed}/${w}/${h}`;

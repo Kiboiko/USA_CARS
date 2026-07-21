@@ -1,4 +1,5 @@
-// MOCK — GET /api/admin/leads → [{ id, car_id, name, contact, message, created_at }]
+// MOCK — GET /api/admin/leads
+// → [{ id, car_id, name, phone, email, interest, message, created_at }]
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/app/api/_mock";
 import { leads } from "@/lib/mock-data";

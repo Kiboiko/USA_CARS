@@ -1,7 +1,7 @@
 // MOCK — POST /api/leads → { ok: true }
 // Real backend (Role 1) also emails (Titan SMTP) + appends to Google Sheets.
 import { NextResponse } from "next/server";
-import { leads, nextLeadId } from "@/lib/mock-data";
+import { INTEREST_VALUES, leads, nextLeadId } from "@/lib/mock-data";
 import type { LeadInput } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -15,19 +15,31 @@ export async function POST(req: Request) {
   }
 
   const name = (body.name ?? "").trim();
-  const contact = (body.contact ?? "").trim();
-  if (!name || !contact) {
+  const phone = (body.phone ?? "").trim();
+  const email = (body.email ?? "").trim();
+  const interest = (body.interest ?? "").trim();
+
+  // At least one contact method is required.
+  if (!name || (!phone && !email)) {
     return NextResponse.json(
-      { error: "name and contact are required" },
+      { error: "name and at least one of phone/email are required" },
       { status: 422 },
     );
+  }
+
+  // Interest must be a known slug or empty ("" = not selected). Mirrors
+  // Role 1: an unknown value → 400.
+  if (interest !== "" && !INTEREST_VALUES.has(interest)) {
+    return NextResponse.json({ error: "invalid interest" }, { status: 400 });
   }
 
   leads.unshift({
     id: nextLeadId(),
     car_id: body.car_id ?? null,
     name,
-    contact,
+    phone,
+    email,
+    interest,
     message: (body.message ?? "").trim(),
     created_at: new Date().toISOString(),
   });
