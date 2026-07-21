@@ -1,17 +1,23 @@
-# USA Cars — Backend (Role 1)
+# USA Cars — full-stack site
 
-Backend / API / integrations for the car-sales site (ТЗ `TZ_sayt_avto_2_roli.md`, **Роль 1**).
-Next.js (App Router) + TypeScript. Persistence uses Node's built-in `node:sqlite`
-(no native npm dependency). Fully covered by Vitest.
+Used-car sales site for the US market (ТЗ `TZ_sayt_avto_2_roli.md`). Single
+**Next.js 15 (App Router) + React 19 + TypeScript** app containing both roles:
 
-> Role 2 (frontend/UI) is intentionally **not** implemented here — only the placeholder
-> root page exists so the app builds. Role 1 provides the API under `/api/*`.
+- **Role 1 — backend / API / integrations:** DB (`node:sqlite`), the `/api/*`
+  contract (§6), lead pipeline (DB → email → Google Sheets), admin auth + CRUD.
+- **Role 2 — frontend / UI:** public site (car list, car page, lead form, static
+  pages, SEO) and the admin panel, all talking to the real API on the same origin.
+
+The two branches (`Backend`, `Frontend`) were merged here; the frontend's mock API
+routes were dropped in favour of Role 1's real backend, and everything lives under
+`src/`.
 
 ## Stack
 
 | Concern | Choice |
 |---|---|
-| Framework | Next.js 15 (App Router route handlers) |
+| Framework | Next.js 15 (App Router) |
+| UI | React 19, server components + client lead form / admin |
 | DB | `node:sqlite` (built into Node ≥ 22.5 / 24) |
 | Validation | zod |
 | Auth | bcryptjs (password hash) + jose (JWT, HS256) |
@@ -25,22 +31,33 @@ Requires **Node ≥ 22.5** (uses `node:sqlite`). Developed on Node 24.
 
 ```bash
 npm install
-cp .env.example .env     # fill in JWT_SECRET, admin passwords, SMTP, Sheets
-npm run db:migrate       # create the SQLite file + schema
-npm run db:seed          # create admin logins (from env) + sample cars
-npm run dev              # http://localhost:3000
+cp .env.example .env      # fill in JWT_SECRET, admin passwords, SMTP, Sheets
+npm run db:migrate        # create the SQLite file + schema
+npm run db:seed           # create admin logins (from env) + sample cars
+npm run dev               # http://localhost:3000
 ```
+
+Because the API is same-origin, leave `NEXT_PUBLIC_API_BASE_URL` empty. Set it only
+if the frontend is ever deployed separately from the backend.
 
 ## Scripts
 
 | Script | Purpose |
 |---|---|
 | `npm run dev` / `build` / `start` | Next.js dev / production build / serve |
+| `npm run lint` | next lint |
 | `npm run db:migrate` | Apply schema to `DATABASE_PATH` |
 | `npm run db:seed` | Seed admin users (env) + sample cars (only if empty) |
-| `npm test` | Run the Vitest suite |
-| `npm run test:coverage` | Suite + coverage report |
+| `npm test` / `test:coverage` | Vitest suite (+ coverage) |
 | `npm run typecheck` | `tsc --noEmit` |
+
+## Pages (Role 2)
+
+- `/` — car list (grid), server-rendered from `GET /api/cars`
+- `/cars/[id]` — gallery + specs + lead form (`GET /api/cars/:id`, `POST /api/leads`)
+- `/contacts`, `/privacy`, `/team` — static pages
+- `/admin/login`, `/admin/cars` (CRUD + upload), `/admin/leads`
+- SEO: per-page metadata + OpenGraph, `sitemap.xml`, `robots.txt`
 
 ## API (contract — ТЗ §6)
 
@@ -57,8 +74,8 @@ npm run dev              # http://localhost:3000
 **Lead form fields** (client-provided example — NAME / PHONE / EMAIL / SELECT YOUR INTEREST / MESSAGE):
 
 - `name` — **required**.
-- `phone`, `email` — both optional individually, but **at least one is required** (a way to reply). `email` is format-validated when present.
-- `interest` — optional; one of the slugs below (empty = placeholder "Select Your Interest" not chosen). Fetch the list from `GET /api/lead-options`:
+- `phone`, `email` — both optional individually, but **at least one is required**. `email` is format-validated when present.
+- `interest` — optional; one of the slugs below (empty = placeholder not chosen). Fetch from `GET /api/lead-options`:
 
   | value (API) | label (UI) |
   |---|---|
@@ -71,9 +88,9 @@ npm run dev              # http://localhost:3000
 
 - `message` — optional.
 
-`POST /api/leads` runs the flow from ТЗ §2.2: **save to DB → email (Titan) → Google Sheets append**.
-Email/Sheets are best-effort — if either is unconfigured or fails, the lead is still
-saved and the endpoint still returns `201`.
+`POST /api/leads` runs the flow from ТЗ §2.2: **save to DB → email (Titan) → Google
+Sheets append**. Email/Sheets are best-effort — if unconfigured or failing, the lead
+is still saved and the endpoint still returns `201`.
 
 ### Admin (require `Authorization: Bearer <token>`)
 
@@ -82,48 +99,40 @@ saved and the endpoint still returns `201`.
 | POST | `/api/admin/login` | `{ username, password }` | `{ token }` |
 | GET | `/api/admin/cars` | — | list |
 | POST | `/api/admin/cars` | `{ make, model, year, price, mileage?, description?, photos? }` | `201 car` |
-| GET | `/api/admin/cars/:id` | — | `car` |
-| PUT | `/api/admin/cars/:id` | same as POST | `car` |
-| DELETE | `/api/admin/cars/:id` | — | `{ ok: true }` |
+| GET/PUT/DELETE | `/api/admin/cars/:id` | PUT: same as POST | `car` / `{ ok: true }` |
 | POST | `/api/admin/upload` | multipart `file` | `201 { url }` |
 | GET | `/api/admin/leads` | — | `[{ id, car_id, name, phone, email, interest, message, created_at }]` |
 
-`/api/admin/*` is guarded twice: edge middleware ([src/middleware.ts](src/middleware.ts))
-plus `requireAdmin()` inside each handler. `/api/admin/login` is public.
-
-## Environment
-
-See [.env.example](.env.example). Key points:
-
-- **`JWT_SECRET`** — required; used to sign admin tokens.
-- **Email** (`SMTP_*`, `LEADS_EMAIL_TO`) — Titan host/port from the mailbox's
-  *Webmail → Settings → Configure 3rd party apps* (ТЗ §4). If incomplete, email is skipped.
-- **Google Sheets** (`GOOGLE_SHEETS_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`) —
-  share the sheet with the service-account email. Private key is only ever read on the
-  backend. If incomplete, Sheets append is skipped.
+`/api/admin/*` is guarded by edge middleware ([src/middleware.ts](src/middleware.ts))
+plus `requireAdmin()` in each handler. `/api/admin/login` is public.
 
 ## Layout
 
 ```
 src/
-  app/api/**/route.ts   # thin route handlers (contract §6)
-  middleware.ts         # edge guard for /api/admin/*
+  app/
+    (site)/            public pages (header/footer chrome): home, cars/[id], contacts, privacy, team
+    admin/             admin panel (own chrome + client auth gate)
+    api/**/route.ts    real backend route handlers (Role 1)
+    layout.tsx         root layout + site metadata
+    robots.ts, sitemap.ts, globals.css
+  middleware.ts        edge guard for /api/admin/*
+  components/          Header, Footer, CarCard, Gallery, LeadForm, admin/CarFormModal
   lib/
-    config.ts           # env parsing (single source of env access)
-    validation.ts       # zod request schemas
-    http.ts             # json()/error helpers + withErrorHandling
-    adminGuard.ts       # requireAdmin()
-    db/                  # schema, connection (node:sqlite), repos, bootstrap
-    services/           # auth, email, sheets, upload, leadService (orchestration)
-scripts/                # migrate.ts, seed.ts (run via tsx)
-tests/                  # Vitest — mirrors src/, 100+ tests
+    api.ts, server-api.ts   frontend fetch layer (client + server components)
+    types.ts, format.ts, site.ts, admin-auth.ts
+    config.ts, validation.ts, http.ts, adminGuard.ts
+    db/                schema, connection (node:sqlite), repos, bootstrap
+    services/          auth, tokens, email, sheets, upload, leadService
+scripts/               migrate.ts, seed.ts (run via tsx)
+tests/                 Vitest — backend layers, 125+ tests
 ```
 
-## Design notes
+## Notes
 
-- **Testability by injection.** Side-effects (SMTP transport, `fetch` for Sheets,
-  filesystem for uploads) are passed in, so tests use fakes and never hit the network/disk.
-- **Repositories take a `Db` argument** rather than a global, so every DB test runs against
-  a fresh in-memory database.
-- **`node:sqlite` is loaded via `createRequire`** in [connection.ts](src/lib/db/connection.ts)
-  because bundlers don't yet recognise it as a built-in.
+- **Contract coupling:** field names in [src/lib/types.ts](src/lib/types.ts) (frontend)
+  mirror [src/lib/validation.ts](src/lib/validation.ts) (backend). Change one → change both.
+- **Testability by injection:** side-effects (SMTP transport, `fetch` for Sheets,
+  filesystem for uploads) are injected, so tests never hit the network/disk.
+- **`node:sqlite` via `createRequire`** in [connection.ts](src/lib/db/connection.ts) —
+  bundlers don't yet recognise it as a built-in.
