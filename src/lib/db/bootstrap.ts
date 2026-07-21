@@ -48,33 +48,66 @@ export function adminsFromEnv(env: NodeJS.ProcessEnv): AdminSeed[] {
   return admins;
 }
 
+// Demo photos use picsum (allowed in next.config images.remotePatterns) so the
+// seeded inventory renders real images before the client uploads their own.
+function demoPhotos(seed: string, n = 3): string[] {
+  return Array.from({ length: n }, (_, i) => `https://picsum.photos/seed/${seed}-${i + 1}/1200/800`);
+}
+
 export const SAMPLE_CARS: CarInput[] = [
   {
     make: "Toyota",
-    model: "Camry",
+    model: "Camry SE",
     year: 2021,
     price: 24500,
     mileage: 32000,
-    description: "Clean title, one owner, full service history.",
-    photos: ["/uploads/sample-camry-1.jpg", "/uploads/sample-camry-2.jpg"],
+    description: "Clean title, one owner, full service history. Apple CarPlay, backup camera.",
+    photos: demoPhotos("camry"),
   },
   {
     make: "Ford",
-    model: "Mustang",
+    model: "Mustang GT",
     year: 2019,
     price: 32900,
     mileage: 41000,
-    description: "GT 5.0, premium package.",
-    photos: ["/uploads/sample-mustang-1.jpg"],
+    description: "GT 5.0 V8, premium package, performance exhaust.",
+    photos: demoPhotos("mustang"),
   },
   {
     make: "Honda",
-    model: "Civic",
+    model: "Civic Touring",
     year: 2022,
     price: 23200,
     mileage: 18000,
-    description: "Fuel efficient, like new.",
-    photos: [],
+    description: "Fuel efficient, like new, heated seats.",
+    photos: demoPhotos("civic"),
+  },
+  {
+    make: "Tesla",
+    model: "Model 3",
+    year: 2021,
+    price: 34990,
+    mileage: 22100,
+    description: "Long Range AWD, autopilot, one owner.",
+    photos: demoPhotos("model3"),
+  },
+  {
+    make: "Jeep",
+    model: "Wrangler Sahara",
+    year: 2021,
+    price: 39900,
+    mileage: 25300,
+    description: "4x4, hardtop, tow package.",
+    photos: demoPhotos("wrangler"),
+  },
+  {
+    make: "BMW",
+    model: "330i xDrive",
+    year: 2020,
+    price: 29900,
+    mileage: 37600,
+    description: "M Sport package, navigation, sunroof.",
+    photos: demoPhotos("bmw330"),
   },
 ];
 

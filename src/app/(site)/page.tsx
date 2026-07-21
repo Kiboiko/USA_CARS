@@ -16,25 +16,40 @@ export default async function HomePage() {
   return (
     <div className="container">
       <section className="hero">
-        <h1>Find your next car</h1>
-        <p>
-          Hand-picked used cars across the USA. Browse the inventory, check photos
-          and specs, and request a test drive in a couple of clicks.
+        <p className="eyebrow">Used cars · nationwide · inspected</p>
+        <h1 className="poster">
+          Priced on the <span className="em">glass.</span>
+        </h1>
+        <p className="lede">
+          Every car on the lot is inspected, honestly priced, and ready for a test
+          drive. Find yours and start a conversation in a couple of clicks.
         </p>
       </section>
 
+      <div className="roadline" aria-hidden="true" />
+
       {failed ? (
         <div className="state">
-          Could not load the inventory right now. Please try again later.
+          We couldn&apos;t load the lot right now. Give it a moment and refresh.
         </div>
       ) : cars.length === 0 ? (
-        <div className="state">No cars in the inventory yet. Check back soon.</div>
+        <div className="state">The lot is empty right now — new arrivals soon.</div>
       ) : (
-        <section className="grid" aria-label="Car inventory">
-          {cars.map((car) => (
-            <CarCard key={car.id} car={car} />
-          ))}
-        </section>
+        <>
+          <div className="section-head">
+            <p className="eyebrow" style={{ margin: 0 }}>
+              On the lot
+            </p>
+            <span className="count">
+              {cars.length} {cars.length === 1 ? "car" : "cars"} in stock
+            </span>
+          </div>
+          <section className="grid" aria-label="Car inventory">
+            {cars.map((car) => (
+              <CarCard key={car.id} car={car} />
+            ))}
+          </section>
+        </>
       )}
     </div>
   );

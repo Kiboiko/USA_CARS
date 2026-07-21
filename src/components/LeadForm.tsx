@@ -109,11 +109,12 @@ export default function LeadForm({
   if (status === "ok") {
     return (
       <div className="panel" role="status">
-        <div className="alert alert-ok" style={{ marginBottom: 12 }}>
-          Thank you! Your request has been sent. We'll contact you shortly.
+        <p className="eyebrow">Inquiry sent</p>
+        <div className="alert alert-ok" style={{ marginBottom: 14 }}>
+          Got it — we&apos;ll be in touch shortly, usually the same day.
         </div>
         <button className="btn" onClick={() => setStatus("idle")}>
-          Send another request
+          Ask about another car
         </button>
       </div>
     );
@@ -121,7 +122,11 @@ export default function LeadForm({
 
   return (
     <form className="panel" onSubmit={handleSubmit} noValidate>
-      <h3 style={{ marginTop: 0 }}>Request a call back</h3>
+      <p className="eyebrow">Inquiry</p>
+      <h3>Ask about this car</h3>
+      <p className="panel-sub">
+        Leave a phone or email and we&apos;ll get back to you — no account, no spam.
+      </p>
 
       {status === "error" && (
         <div className="alert alert-err">{serverError}</div>
@@ -175,14 +180,14 @@ export default function LeadForm({
       </div>
 
       <div className="field">
-        <label htmlFor="lead-interest">Interest</label>
+        <label htmlFor="lead-interest">What are you after?</label>
         <select
           id="lead-interest"
           name="interest"
           value={interest}
           onChange={(e) => setInterest(e.target.value)}
         >
-          <option value="">Select Your Interest</option>
+          <option value="">Select your interest</option>
           {options.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
@@ -197,7 +202,7 @@ export default function LeadForm({
           id="lead-message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Your question or preferred time to call"
+          placeholder="A question, or a good time to reach you"
         />
       </div>
 
@@ -206,7 +211,7 @@ export default function LeadForm({
         className="btn btn-primary btn-block"
         disabled={status === "sending"}
       >
-        {status === "sending" ? "Sending…" : "Send request"}
+        {status === "sending" ? "Sending…" : "Send inquiry"}
       </button>
     </form>
   );

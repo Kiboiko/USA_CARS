@@ -1,15 +1,15 @@
 import { getDb } from "@/lib/db/connection";
-import { listCars, createCar } from "@/lib/db/cars";
+import { listCarsDetail, createCar } from "@/lib/db/cars";
 import { requireAdmin } from "@/lib/adminGuard";
 import { carSchema, formatZodError } from "@/lib/validation";
 import { json, jsonError, parseJsonBody, withErrorHandling } from "@/lib/http";
 
 export const dynamic = "force-dynamic";
 
-// GET /api/admin/cars → list (admin)
+// GET /api/admin/cars → full car rows (admin needs photos[] + description)
 export const GET = withErrorHandling(async (req: Request): Promise<Response> => {
   await requireAdmin(req);
-  return json(listCars(getDb()));
+  return json(listCarsDetail(getDb()));
 });
 
 // POST /api/admin/cars  body: { make, model, year, price, mileage, description, photos }

@@ -58,9 +58,17 @@ export default async function CarPage({
         </div>
 
         <div>
+          <p className="eyebrow">Stock № {String(car.id).padStart(4, "0")}</p>
           <h1>{title}</h1>
-          <div className="price-lg">{formatPrice(car.price)}</div>
+          <div className="price-lg">
+            <span className="cur">$</span>
+            {car.price.toLocaleString("en-US")}
+          </div>
 
+          <div className="sticker-head">
+            <span>Window sticker</span>
+            <span>VIN on request</span>
+          </div>
           <div className="specs">
             <div className="row">
               <span className="k">Make</span>
@@ -75,7 +83,7 @@ export default async function CarPage({
               <span className="v">{car.year}</span>
             </div>
             <div className="row">
-              <span className="k">Mileage</span>
+              <span className="k">Odometer</span>
               <span className="v">{formatMileage(car.mileage)}</span>
             </div>
           </div>

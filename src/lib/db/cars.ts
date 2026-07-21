@@ -81,6 +81,18 @@ export function listCars(db: Db): CarListItem[] {
   });
 }
 
+/**
+ * List all cars, newest first, as full rows (with photos array + description).
+ * Used by the admin panel, which needs the complete car — unlike the public
+ * list which only needs a cover photo.
+ */
+export function listCarsDetail(db: Db): Car[] {
+  const rows = db
+    .prepare("SELECT * FROM cars ORDER BY created_at DESC, id DESC")
+    .all() as unknown as CarRow[];
+  return rows.map(mapRow);
+}
+
 /** Fetch a single car by id, or null if not found. */
 export function getCar(db: Db, id: number): Car | null {
   const row = db.prepare("SELECT * FROM cars WHERE id = ?").get(id) as CarRow | undefined;

@@ -64,11 +64,16 @@ describe("admin cars — CRUD", () => {
     expect(res.status).toBe(400);
   });
 
-  it("lists cars for the admin", async () => {
-    seedCar(getDb());
+  it("lists cars for the admin with full detail (photos array + description)", async () => {
+    seedCar(getDb(), { photos: ["/a.jpg", "/b.jpg"], description: "full" });
     const res = await listAdminCars(new Request("http://t/api/admin/cars", { headers: authHeader(token) }));
     expect(res.status).toBe(200);
-    expect(await res.json()).toHaveLength(1);
+    const body = await res.json();
+    expect(body).toHaveLength(1);
+    // Admin needs the full car, not the public list-item shape.
+    expect(Array.isArray(body[0].photos)).toBe(true);
+    expect(body[0].photos).toEqual(["/a.jpg", "/b.jpg"]);
+    expect(body[0].description).toBe("full");
   });
 
   it("gets a single car by id", async () => {

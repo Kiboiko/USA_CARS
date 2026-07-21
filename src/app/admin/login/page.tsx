@@ -33,9 +33,8 @@ export default function AdminLoginPage() {
   return (
     <div className="center-card">
       <form className="panel" onSubmit={handleSubmit}>
-        <div className="brand" style={{ fontSize: 20, marginBottom: 16 }}>
-          <span className="mark">◆</span> Admin sign in
-        </div>
+        <p className="eyebrow">Admin</p>
+        <h3 style={{ marginTop: 0, marginBottom: 16 }}>Sign in</h3>
 
         {error && <div className="alert alert-err">{error}</div>}
 
@@ -66,7 +65,7 @@ export default function AdminLoginPage() {
         </button>
 
         <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 14, marginBottom: 0 }}>
-          Demo (mock backend): <b>admin</b> / <b>admin</b>
+          Seeded dev logins: <b>admin1</b> / <b>admin1</b> · <b>admin2</b> / <b>admin2</b>
         </p>
       </form>
     </div>

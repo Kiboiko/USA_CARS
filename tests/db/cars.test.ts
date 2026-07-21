@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Db } from "@/lib/db/connection";
-import { listCars, getCar, createCar, updateCar, deleteCar } from "@/lib/db/cars";
+import { listCars, listCarsDetail, getCar, createCar, updateCar, deleteCar } from "@/lib/db/cars";
 import { makeDb, seedCar } from "../helpers";
 
 describe("cars repository", () => {
@@ -52,6 +52,16 @@ describe("cars repository", () => {
     expect(first.photo_cover).toBe("/first.jpg");
     // list items don't leak description
     expect(first).not.toHaveProperty("description");
+  });
+
+  it("listCarsDetail returns full rows (photos array + description), newest-first", () => {
+    const a = seedCar(db, { make: "First", photos: ["/1.jpg"], description: "d1" });
+    const b = seedCar(db, { make: "Second", photos: [] });
+    const list = listCarsDetail(db);
+    expect(list.map((c) => c.id)).toEqual([b.id, a.id]);
+    const first = list.find((c) => c.id === a.id)!;
+    expect(first.photos).toEqual(["/1.jpg"]);
+    expect(first.description).toBe("d1");
   });
 
   it("updates a car and bumps nothing it shouldn't", () => {

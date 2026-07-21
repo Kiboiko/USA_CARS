@@ -22,8 +22,12 @@ export default function Header() {
   return (
     <header className="site-header">
       <div className="container bar">
-        <Link href="/" className="brand" onClick={() => setOpen(false)}>
-          <span className="mark">◆</span> USA Auto Sales
+        <Link href="/" className="brand" aria-label="USA Auto Sales — home" onClick={() => setOpen(false)}>
+          <span className="plate">
+            <span className="bolt" aria-hidden="true" />
+            USA <span className="tag">AUTO</span> SALES
+            <span className="bolt" aria-hidden="true" />
+          </span>
         </Link>
 
         <button

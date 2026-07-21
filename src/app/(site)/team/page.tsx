@@ -45,10 +45,8 @@ export default function TeamPage() {
         {TEAM.map((m) => (
           <div className="team-card" key={m.name}>
             <img className="avatar" src={m.photo} alt={m.name} />
-            <div style={{ fontWeight: 700 }}>{m.name}</div>
-            <div style={{ color: "var(--brand)", fontSize: 14, margin: "2px 0 8px" }}>
-              {m.role}
-            </div>
+            <div style={{ fontWeight: 700, fontSize: 17 }}>{m.name}</div>
+            <div className="role">{m.role}</div>
             <div style={{ color: "var(--muted)", fontSize: 14 }}>{m.bio}</div>
           </div>
         ))}
