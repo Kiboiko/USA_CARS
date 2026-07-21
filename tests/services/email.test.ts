@@ -23,7 +23,9 @@ const lead: Lead = {
   id: 1,
   car_id: 5,
   name: "Иван",
-  contact: "+1 555",
+  phone: "+1 555",
+  email: "ivan@x.io",
+  interest: "buy_now",
   message: "интересует",
   created_at: "2026-07-21 10:00:00",
 };
@@ -49,7 +51,16 @@ describe("email service", () => {
     expect(msg.subject).toContain("Ford Mustang");
     expect(msg.text).toContain("Иван");
     expect(msg.text).toContain("+1 555");
+    expect(msg.text).toContain("ivan@x.io");
+    expect(msg.text).toContain("Интерес: Buy Now");
     expect(msg.text).toContain("2019 Ford Mustang");
+  });
+
+  it("shows placeholders when phone/email/interest are empty", () => {
+    const msg = buildLeadEmail(config, { ...lead, phone: "", email: "", interest: "" }, null);
+    expect(msg.text).toContain("Телефон: —");
+    expect(msg.text).toContain("Email: —");
+    expect(msg.text).toContain("Интерес: —");
   });
 
   it("handles a lead without a car object but with car_id", () => {

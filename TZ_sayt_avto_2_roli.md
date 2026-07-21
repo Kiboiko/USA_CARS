@@ -25,7 +25,7 @@
 - Список машин: карточка = фото, марка/модель, год, цена, ссылка на детальную страницу
 - Страница машины: галерея, описание, характеристики, лид-форма
 - Контакты / Политика / Команда — статические страницы
-- Не зафиксировано в переписке с клиентом, уточнить: точный набор полей лид-формы (сейчас предполагается имя + телефон/почта + сообщение)
+- Поля лид-формы (согласовано с клиентом, пример прислан): **Name, Phone, Email, Select Your Interest** (выпадающий список), **Message**. Обязательно имя; телефон и email по отдельности необязательны, но хотя бы одно должно быть заполнено. Interest — один из вариантов: Buy Now, Trade-In, Finance This Vehicle, Lease This Vehicle, Schedule a Test Drive, Ask About Availability.
 
 ### 2.2 Обработка заявок
 При отправке лид-формы заявка:
@@ -43,7 +43,7 @@
 | Таблица | Поля |
 |---|---|
 | `cars` | id, make, model, year, price, mileage, description, photos (JSON-массив ссылок или отдельная таблица `car_photos`), created_at, updated_at |
-| `leads` | id, car_id (FK, nullable), name, contact, message, created_at |
+| `leads` | id, car_id (FK, nullable), name, phone, email, interest, message, created_at |
 | `admin_users` | id, username, password_hash |
 
 ## 4. Email и Google Sheets — технические заметки
@@ -98,8 +98,12 @@ GET  /api/cars/:id
      → { id, make, model, year, price, mileage, description, photos: [...] }
 
 POST /api/leads
-     body: { car_id, name, contact, message }
+     body: { car_id?, name, phone?, email?, interest?, message? }
+            (name обязателен; phone|email — хотя бы одно; interest — slug из /api/lead-options)
      → { ok: true }
+
+GET  /api/lead-options
+     → { interests: [{ value, label }] }   // источник значений для выпадающего списка
 
 POST /api/admin/login
      body: { username, password }
@@ -136,6 +140,6 @@ GET  /api/admin/leads
 
 ## 9. Открытые вопросы к клиенту (не зафиксированы в переписке)
 
-- Точный набор полей лид-формы
+- ~~Точный набор полей лид-формы~~ — **согласовано** (см. §2.1, §6): Name, Phone, Email, Interest, Message
 - Кто регистрирует домен/хостинг и Titan-почту, и когда будут доступы
 - Формат/качество фото машин — пришлёт клиент или на усмотрение исполнителя

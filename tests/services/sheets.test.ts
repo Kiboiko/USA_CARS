@@ -20,7 +20,9 @@ const lead: Lead = {
   id: 1,
   car_id: 5,
   name: "Ann",
-  contact: "ann@x.io",
+  phone: "+1 555",
+  email: "ann@x.io",
+  interest: "finance",
   message: "hi",
   created_at: "2026-07-21 10:00:00",
 };
@@ -48,21 +50,25 @@ function jsonResponse(body: unknown, ok = true, status = 200): Response {
 }
 
 describe("sheets service", () => {
-  it("builds a row with a human-readable car label", () => {
+  it("builds a row with human-readable car label and interest", () => {
     expect(buildLeadRow(lead, car)).toEqual([
       "2026-07-21 10:00:00",
       "Ann",
+      "+1 555",
       "ann@x.io",
+      "Finance This Vehicle",
       "2019 Ford Mustang",
       "hi",
     ]);
   });
 
-  it("builds a row with car_id fallback and empty message", () => {
-    expect(buildLeadRow({ ...lead, message: "" }, null)).toEqual([
+  it("builds a row with car_id fallback and empty message/interest", () => {
+    expect(buildLeadRow({ ...lead, message: "", interest: "" }, null)).toEqual([
       "2026-07-21 10:00:00",
       "Ann",
+      "+1 555",
       "ann@x.io",
+      "",
       "#5",
       "",
     ]);

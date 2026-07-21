@@ -4,7 +4,9 @@ export interface Lead {
   id: number;
   car_id: number | null;
   name: string;
-  contact: string;
+  phone: string;
+  email: string;
+  interest: string;
   message: string;
   created_at: string;
 }
@@ -12,15 +14,26 @@ export interface Lead {
 export interface LeadInput {
   car_id?: number | null;
   name: string;
-  contact: string;
+  phone?: string;
+  email?: string;
+  interest?: string;
   message?: string;
 }
 
 /** Insert a lead and return the created row. */
 export function createLead(db: Db, input: LeadInput): Lead {
   const result = db
-    .prepare("INSERT INTO leads (car_id, name, contact, message) VALUES (?, ?, ?, ?)")
-    .run(input.car_id ?? null, input.name, input.contact, input.message ?? "");
+    .prepare(
+      "INSERT INTO leads (car_id, name, phone, email, interest, message) VALUES (?, ?, ?, ?, ?, ?)",
+    )
+    .run(
+      input.car_id ?? null,
+      input.name,
+      input.phone ?? "",
+      input.email ?? "",
+      input.interest ?? "",
+      input.message ?? "",
+    );
   const created = getLead(db, Number(result.lastInsertRowid));
   if (!created) throw new Error("Failed to load lead after insert");
   return created;

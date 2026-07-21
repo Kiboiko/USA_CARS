@@ -25,7 +25,9 @@ CREATE TABLE IF NOT EXISTS leads (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   car_id     INTEGER REFERENCES cars(id) ON DELETE SET NULL,
   name       TEXT    NOT NULL,
-  contact    TEXT    NOT NULL,
+  phone      TEXT    NOT NULL DEFAULT '',
+  email      TEXT    NOT NULL DEFAULT '',
+  interest   TEXT    NOT NULL DEFAULT '', -- slug from INTEREST_OPTIONS, '' = not selected
   message    TEXT    NOT NULL DEFAULT '',
   created_at TEXT    NOT NULL DEFAULT (datetime('now'))
 );

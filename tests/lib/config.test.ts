@@ -84,6 +84,6 @@ describe("config", () => {
     process.env.GOOGLE_PRIVATE_KEY = "line1\\nline2";
     const cfg = loadConfig();
     expect(cfg.sheets!.privateKey).toBe("line1\nline2");
-    expect(cfg.sheets!.range).toBe("Leads!A:E");
+    expect(cfg.sheets!.range).toBe("Leads!A:G");
   });
 });

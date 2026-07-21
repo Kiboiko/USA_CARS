@@ -1,26 +1,83 @@
 import { describe, it, expect } from "vitest";
-import { leadSchema, carSchema, loginSchema, formatZodError } from "@/lib/validation";
+import {
+  leadSchema,
+  carSchema,
+  loginSchema,
+  formatZodError,
+  interestLabel,
+  INTEREST_OPTIONS,
+} from "@/lib/validation";
 
 describe("validation schemas", () => {
   describe("leadSchema", () => {
-    it("accepts a valid lead and trims fields", () => {
-      const parsed = leadSchema.parse({ car_id: "5", name: "  Ann ", contact: "a@x", message: " hi " });
-      expect(parsed).toEqual({ car_id: 5, name: "Ann", contact: "a@x", message: "hi" });
+    it("accepts a full valid lead and trims fields", () => {
+      const parsed = leadSchema.parse({
+        car_id: "5",
+        name: "  Ann ",
+        phone: " +1 555 ",
+        email: " a@x.io ",
+        interest: "buy_now",
+        message: " hi ",
+      });
+      expect(parsed).toEqual({
+        car_id: 5,
+        name: "Ann",
+        phone: "+1 555",
+        email: "a@x.io",
+        interest: "buy_now",
+        message: "hi",
+      });
     });
 
-    it("defaults message to empty and allows nullish car_id", () => {
-      const parsed = leadSchema.parse({ name: "A", contact: "c" });
+    it("accepts a lead with only a phone (email optional)", () => {
+      const parsed = leadSchema.parse({ name: "A", phone: "555" });
+      expect(parsed.email).toBe("");
+      expect(parsed.interest).toBe("");
       expect(parsed.message).toBe("");
       expect(parsed.car_id == null).toBe(true);
     });
 
-    it("rejects empty name/contact", () => {
-      expect(leadSchema.safeParse({ name: "", contact: "c" }).success).toBe(false);
-      expect(leadSchema.safeParse({ name: "a", contact: "  " }).success).toBe(false);
+    it("accepts a lead with only an email", () => {
+      expect(leadSchema.safeParse({ name: "A", email: "a@x.io" }).success).toBe(true);
+    });
+
+    it("rejects a lead with neither phone nor email", () => {
+      const res = leadSchema.safeParse({ name: "A" });
+      expect(res.success).toBe(false);
+      if (!res.success) expect(formatZodError(res.error)).toMatch(/phone or email/);
+    });
+
+    it("rejects an empty name", () => {
+      expect(leadSchema.safeParse({ name: "", phone: "1" }).success).toBe(false);
+    });
+
+    it("rejects an invalid email format", () => {
+      expect(leadSchema.safeParse({ name: "A", email: "not-an-email" }).success).toBe(false);
+    });
+
+    it("rejects an unknown interest value", () => {
+      expect(
+        leadSchema.safeParse({ name: "A", phone: "1", interest: "bogus" }).success,
+      ).toBe(false);
+    });
+
+    it("accepts an empty interest (placeholder not selected)", () => {
+      expect(leadSchema.safeParse({ name: "A", phone: "1", interest: "" }).success).toBe(true);
     });
 
     it("rejects non-positive car_id", () => {
-      expect(leadSchema.safeParse({ car_id: 0, name: "a", contact: "c" }).success).toBe(false);
+      expect(leadSchema.safeParse({ car_id: 0, name: "a", phone: "1" }).success).toBe(false);
+    });
+  });
+
+  describe("interest options", () => {
+    it("maps every slug to its label and unknown/empty to ''", () => {
+      for (const opt of INTEREST_OPTIONS) {
+        expect(interestLabel(opt.value)).toBe(opt.label);
+      }
+      expect(interestLabel("")).toBe("");
+      expect(interestLabel(null)).toBe("");
+      expect(interestLabel("unknown")).toBe("unknown");
     });
   });
 

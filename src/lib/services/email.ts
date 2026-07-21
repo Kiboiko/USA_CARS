@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import type { EmailConfig } from "../config";
 import type { Lead } from "../db/leads";
 import type { Car } from "../db/cars";
+import { interestLabel } from "../validation";
 
 /**
  * Email notification for new leads via Titan SMTP (ТЗ §2.2 / §4).
@@ -45,7 +46,9 @@ export function buildLeadEmail(config: EmailConfig, lead: Lead, car: Car | null)
     "Новая заявка с сайта:",
     "",
     `Имя: ${lead.name}`,
-    `Контакт: ${lead.contact}`,
+    `Телефон: ${lead.phone || "—"}`,
+    `Email: ${lead.email || "—"}`,
+    `Интерес: ${interestLabel(lead.interest) || "—"}`,
     `Машина: ${carLine}`,
     `Сообщение: ${lead.message || "—"}`,
     `Дата: ${lead.created_at}`,

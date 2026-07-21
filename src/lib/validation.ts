@@ -7,12 +7,61 @@ import { z } from "zod";
 
 const currentYear = new Date().getFullYear();
 
-export const leadSchema = z.object({
-  car_id: z.coerce.number().int().positive().nullish(),
-  name: z.string().trim().min(1, "name is required").max(200),
-  contact: z.string().trim().min(1, "contact is required").max(200),
-  message: z.string().trim().max(5000).optional().default(""),
-});
+/**
+ * "Select your interest" options for the lead form (client-provided example).
+ * `value` is the slug stored/sent over the API; `label` is what the frontend
+ * shows. Role 2 renders <option value={value}>{label}</option>; the placeholder
+ * ("Select Your Interest") sends an empty value.
+ */
+export const INTEREST_OPTIONS = [
+  { value: "buy_now", label: "Buy Now" },
+  { value: "trade_in", label: "Trade-In" },
+  { value: "finance", label: "Finance This Vehicle" },
+  { value: "lease", label: "Lease This Vehicle" },
+  { value: "test_drive", label: "Schedule a Test Drive" },
+  { value: "availability", label: "Ask About Availability" },
+] as const;
+
+export type InterestValue = (typeof INTEREST_OPTIONS)[number]["value"];
+
+export const INTEREST_VALUES = INTEREST_OPTIONS.map((o) => o.value) as [
+  InterestValue,
+  ...InterestValue[],
+];
+
+/** Human-readable label for a stored interest slug (empty string if unset/unknown). */
+export function interestLabel(value: string | null | undefined): string {
+  if (!value) return "";
+  return INTEREST_OPTIONS.find((o) => o.value === value)?.label ?? value;
+}
+
+const emailField = z
+  .string()
+  .trim()
+  .max(200)
+  .optional()
+  .default("")
+  .refine((v) => v === "" || z.string().email().safeParse(v).success, "invalid email");
+
+export const leadSchema = z
+  .object({
+    car_id: z.coerce.number().int().positive().nullish(),
+    name: z.string().trim().min(1, "name is required").max(200),
+    phone: z.string().trim().max(50).optional().default(""),
+    email: emailField,
+    // Accept a known slug or empty (placeholder not selected).
+    interest: z
+      .enum(INTEREST_VALUES)
+      .or(z.literal(""))
+      .optional()
+      .default(""),
+    message: z.string().trim().max(5000).optional().default(""),
+  })
+  // At least one way to contact the lead back must be provided.
+  .refine((d) => d.phone.length > 0 || d.email.length > 0, {
+    message: "phone or email is required",
+    path: ["phone"],
+  });
 
 export type LeadPayload = z.infer<typeof leadSchema>;
 

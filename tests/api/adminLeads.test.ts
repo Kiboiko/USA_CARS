@@ -20,14 +20,14 @@ describe("GET /api/admin/leads", () => {
   });
 
   it("returns leads newest-first for an authenticated admin", async () => {
-    createLead(getDb(), { name: "one", contact: "1" });
-    createLead(getDb(), { name: "two", contact: "2" });
+    createLead(getDb(), { name: "one", phone: "1" });
+    createLead(getDb(), { name: "two", email: "two@x.io", interest: "buy_now" });
     const res = await adminLeads(
       new Request("http://t/api/admin/leads", { headers: authHeader(token) }),
     );
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toHaveLength(2);
-    expect(body[0].name).toBe("two");
+    expect(body[0]).toMatchObject({ name: "two", email: "two@x.io", interest: "buy_now" });
   });
 });

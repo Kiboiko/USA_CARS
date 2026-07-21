@@ -50,8 +50,26 @@ npm run dev              # http://localhost:3000
 |---|---|---|---|
 | GET | `/api/cars` | — | `[{ id, make, model, year, price, mileage, photo_cover }]` |
 | GET | `/api/cars/:id` | — | `{ id, make, model, year, price, mileage, description, photos }` |
-| POST | `/api/leads` | `{ car_id?, name, contact, message? }` | `201 { ok: true }` |
+| POST | `/api/leads` | `{ car_id?, name, phone?, email?, interest?, message? }` | `201 { ok: true }` |
+| GET | `/api/lead-options` | — | `{ interests: [{ value, label }] }` |
 | GET | `/api/health` | — | `{ ok: true, ts }` |
+
+**Lead form fields** (client-provided example — NAME / PHONE / EMAIL / SELECT YOUR INTEREST / MESSAGE):
+
+- `name` — **required**.
+- `phone`, `email` — both optional individually, but **at least one is required** (a way to reply). `email` is format-validated when present.
+- `interest` — optional; one of the slugs below (empty = placeholder "Select Your Interest" not chosen). Fetch the list from `GET /api/lead-options`:
+
+  | value (API) | label (UI) |
+  |---|---|
+  | `buy_now` | Buy Now |
+  | `trade_in` | Trade-In |
+  | `finance` | Finance This Vehicle |
+  | `lease` | Lease This Vehicle |
+  | `test_drive` | Schedule a Test Drive |
+  | `availability` | Ask About Availability |
+
+- `message` — optional.
 
 `POST /api/leads` runs the flow from ТЗ §2.2: **save to DB → email (Titan) → Google Sheets append**.
 Email/Sheets are best-effort — if either is unconfigured or fails, the lead is still
@@ -68,7 +86,7 @@ saved and the endpoint still returns `201`.
 | PUT | `/api/admin/cars/:id` | same as POST | `car` |
 | DELETE | `/api/admin/cars/:id` | — | `{ ok: true }` |
 | POST | `/api/admin/upload` | multipart `file` | `201 { url }` |
-| GET | `/api/admin/leads` | — | `[{ id, car_id, name, contact, message, created_at }]` |
+| GET | `/api/admin/leads` | — | `[{ id, car_id, name, phone, email, interest, message, created_at }]` |
 
 `/api/admin/*` is guarded twice: edge middleware ([src/middleware.ts](src/middleware.ts))
 plus `requireAdmin()` inside each handler. `/api/admin/login` is public.

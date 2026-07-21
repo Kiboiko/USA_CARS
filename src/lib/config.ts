@@ -77,7 +77,7 @@ function parseSheetsConfig(): SheetsConfig | null {
 
   return {
     spreadsheetId,
-    range: optional("GOOGLE_SHEETS_RANGE") ?? "Leads!A:E",
+    range: optional("GOOGLE_SHEETS_RANGE") ?? "Leads!A:G",
     clientEmail,
     // Env vars commonly store the key with literal "\n"; normalise to newlines.
     privateKey: rawKey.replace(/\\n/g, "\n"),

@@ -9,30 +9,43 @@ describe("leads repository", () => {
     db = makeDb();
   });
 
-  it("creates a lead linked to a car", () => {
+  it("creates a lead linked to a car with all fields", () => {
     const car = seedCar(db);
-    const lead = createLead(db, { car_id: car.id, name: "Ann", contact: "ann@x.io", message: "hi" });
+    const lead = createLead(db, {
+      car_id: car.id,
+      name: "Ann",
+      phone: "+1 555",
+      email: "ann@x.io",
+      interest: "buy_now",
+      message: "hi",
+    });
     expect(lead.id).toBeGreaterThan(0);
     expect(lead.car_id).toBe(car.id);
-    expect(getLead(db, lead.id)!.name).toBe("Ann");
+    const stored = getLead(db, lead.id)!;
+    expect(stored.name).toBe("Ann");
+    expect(stored.phone).toBe("+1 555");
+    expect(stored.email).toBe("ann@x.io");
+    expect(stored.interest).toBe("buy_now");
   });
 
-  it("creates a lead without a car (car_id null) and default message", () => {
-    const lead = createLead(db, { name: "Bob", contact: "555" });
+  it("defaults phone/email/interest/message to empty strings", () => {
+    const lead = createLead(db, { name: "Bob", phone: "555" });
     expect(lead.car_id).toBeNull();
+    expect(lead.email).toBe("");
+    expect(lead.interest).toBe("");
     expect(lead.message).toBe("");
   });
 
   it("sets car_id to null when the referenced car is deleted (ON DELETE SET NULL)", () => {
     const car = seedCar(db);
-    const lead = createLead(db, { car_id: car.id, name: "C", contact: "c" });
+    const lead = createLead(db, { car_id: car.id, name: "C", email: "c@x.io" });
     db.prepare("DELETE FROM cars WHERE id = ?").run(car.id);
     expect(getLead(db, lead.id)!.car_id).toBeNull();
   });
 
   it("lists leads newest-first", () => {
-    const l1 = createLead(db, { name: "one", contact: "1" });
-    const l2 = createLead(db, { name: "two", contact: "2" });
+    const l1 = createLead(db, { name: "one", phone: "1" });
+    const l2 = createLead(db, { name: "two", phone: "2" });
     const list = listLeads(db);
     expect(list.map((l) => l.id)).toEqual([l2.id, l1.id]);
   });

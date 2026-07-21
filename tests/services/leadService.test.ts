@@ -37,7 +37,7 @@ describe("lead orchestration", () => {
   });
 
   it("persists the lead even with no integrations configured", async () => {
-    const result = await submitLead(db, baseConfig(), { name: "A", contact: "c" });
+    const result = await submitLead(db, baseConfig(), { name: "A", phone: "555" });
     expect(result.lead.id).toBeGreaterThan(0);
     expect(result.emailSent).toBe(false);
     expect(result.sheetAppended).toBe(false);
@@ -50,7 +50,7 @@ describe("lead orchestration", () => {
     const result = await submitLead(
       db,
       baseConfig({ email: emailConfig }),
-      { car_id: car.id, name: "A", contact: "c" },
+      { car_id: car.id, name: "A", phone: "555" },
       { transport },
     );
     expect(result.emailSent).toBe(true);
@@ -63,7 +63,7 @@ describe("lead orchestration", () => {
     const result = await submitLead(
       db,
       baseConfig({ email: emailConfig }),
-      { name: "A", contact: "c" },
+      { name: "A", phone: "555" },
       { transport },
     );
     expect(result.emailSent).toBe(false);
@@ -88,7 +88,7 @@ describe("lead orchestration", () => {
     const result = await submitLead(
       db,
       baseConfig({ sheets }),
-      { name: "A", contact: "c" },
+      { name: "A", phone: "555" },
       { fetchImpl: fetchImpl as unknown as typeof fetch },
     );
     // With an invalid key the append fails gracefully but the lead is still saved.

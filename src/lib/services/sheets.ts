@@ -2,6 +2,7 @@ import { SignJWT, importPKCS8 } from "jose";
 import type { SheetsConfig } from "../config";
 import type { Lead } from "../db/leads";
 import type { Car } from "../db/cars";
+import { interestLabel } from "../validation";
 
 /**
  * Google Sheets integration (ТЗ §2.2 / §4): append one row per lead.
@@ -53,7 +54,16 @@ export function buildLeadRow(lead: Lead, car: Car | null): string[] {
     : lead.car_id
       ? `#${lead.car_id}`
       : "";
-  return [lead.created_at, lead.name, lead.contact, carLabel, lead.message ?? ""];
+  // Columns: date | name | phone | email | interest | car | message  (range A:G)
+  return [
+    lead.created_at,
+    lead.name,
+    lead.phone ?? "",
+    lead.email ?? "",
+    interestLabel(lead.interest),
+    carLabel,
+    lead.message ?? "",
+  ];
 }
 
 /** Append a single row to the configured spreadsheet range. */
