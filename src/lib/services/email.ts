@@ -22,7 +22,9 @@ export interface MailTransport {
   sendMail(message: MailMessage): Promise<unknown>;
 }
 
-/** Build a real nodemailer transport from Titan SMTP config. */
+export type FetchLike = typeof fetch;
+
+/** Build a nodemailer SMTP transport from config. */
 export function createSmtpTransport(config: EmailConfig): MailTransport {
   const transporter = nodemailer.createTransport({
     host: config.host,
@@ -33,6 +35,42 @@ export function createSmtpTransport(config: EmailConfig): MailTransport {
   return {
     sendMail: (message) => transporter.sendMail(message),
   };
+}
+
+/**
+ * Build a Resend HTTP transport. Sends over HTTPS (api.resend.com), so it works
+ * in networks that block outbound SMTP. `fetchImpl` is injectable for tests.
+ */
+export function createResendTransport(
+  config: EmailConfig,
+  fetchImpl: FetchLike = fetch,
+): MailTransport {
+  return {
+    async sendMail(message: MailMessage) {
+      const res = await fetchImpl("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${config.resendApiKey}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          from: message.from,
+          to: [message.to],
+          subject: message.subject,
+          text: message.text,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error(`Resend API error ${res.status}: ${await res.text()}`);
+      }
+      return res.json();
+    },
+  };
+}
+
+/** Pick the transport based on config: Resend if an API key is set, else SMTP. */
+export function createMailTransport(config: EmailConfig): MailTransport {
+  return config.resendApiKey ? createResendTransport(config) : createSmtpTransport(config);
 }
 
 export function buildLeadEmail(config: EmailConfig, lead: Lead, car: Car | null): MailMessage {

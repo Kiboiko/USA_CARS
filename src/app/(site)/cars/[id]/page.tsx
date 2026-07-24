@@ -114,7 +114,7 @@ export default async function CarPage({
               <a href="#inquiry" className="btn btn-primary btn-block">
                 Check availability
               </a>
-              <a href="tel:+15551234567" className="btn btn-block">
+              <a href="tel:+18507134077" className="btn btn-block">
                 ☎ Call about this car
               </a>
             </div>

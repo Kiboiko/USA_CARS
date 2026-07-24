@@ -58,7 +58,9 @@ export function buildLeadRow(lead: Lead, car: Car | null): string[] {
   return [
     lead.created_at,
     lead.name,
-    lead.phone ?? "",
+    // Leading apostrophe forces Google Sheets to store the phone as text — a
+    // leading "+" would otherwise be read as a formula. Sheets hides the quote.
+    lead.phone ? `'${lead.phone}` : "",
     lead.email ?? "",
     interestLabel(lead.interest),
     carLabel,

@@ -12,8 +12,8 @@ const NAV = [
   { href: "/team", label: "Team" },
 ];
 
-const PHONE = "+1 (555) 123-4567";
-const PHONE_HREF = "tel:+15551234567";
+const PHONE = "+1 850-713-4077";
+const PHONE_HREF = "tel:+18507134077";
 
 export default function Header() {
   const pathname = usePathname();
@@ -26,7 +26,7 @@ export default function Header() {
     <>
       <div className="topbar">
         <div className="container topbar-inner">
-          <span className="tb-hours">Mon–Sat 9:00–19:00 · Springfield, IL</span>
+          <span className="tb-hours">Mon–Sat 9:00–19:00 · Davenport, FL</span>
           <span className="tb-right">
             Sales <span className="sep">|</span>
             <a href={PHONE_HREF}>{PHONE}</a>
@@ -36,8 +36,8 @@ export default function Header() {
 
       <header className="site-header">
         <div className="container bar">
-          <Link href="/" className="brand-word" aria-label="USA Auto Sales — home" onClick={() => setOpen(false)}>
-            USA<span className="accent">AUTO</span>SALES
+          <Link href="/" className="brand-word" aria-label="Pro AutoHub — home" onClick={() => setOpen(false)}>
+            PRO<span className="accent">AUTO</span>HUB
           </Link>
 
           <button

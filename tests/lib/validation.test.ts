@@ -14,7 +14,7 @@ describe("validation schemas", () => {
       const parsed = leadSchema.parse({
         car_id: "5",
         name: "  Ann ",
-        phone: " +1 555 ",
+        phone: " +1 (212) 555-0134 ",
         email: " a@x.io ",
         interest: "buy_now",
         message: " hi ",
@@ -22,7 +22,7 @@ describe("validation schemas", () => {
       expect(parsed).toEqual({
         car_id: 5,
         name: "Ann",
-        phone: "+1 555",
+        phone: "+1 (212) 555-0134",
         email: "a@x.io",
         interest: "buy_now",
         message: "hi",
@@ -30,11 +30,30 @@ describe("validation schemas", () => {
     });
 
     it("accepts a lead with only a phone (email optional)", () => {
-      const parsed = leadSchema.parse({ name: "A", phone: "555" });
+      const parsed = leadSchema.parse({ name: "A", phone: "2125550134" });
       expect(parsed.email).toBe("");
       expect(parsed.interest).toBe("");
       expect(parsed.message).toBe("");
       expect(parsed.car_id == null).toBe(true);
+    });
+
+    it("rejects a phone that is not a valid US number", () => {
+      const res = leadSchema.safeParse({ name: "A", phone: "555-12" });
+      expect(res.success).toBe(false);
+      if (!res.success) expect(formatZodError(res.error)).toMatch(/US phone/);
+    });
+
+    it("accepts common US phone formats", () => {
+      for (const phone of [
+        "2125550134",
+        "212-555-0134",
+        "(212) 555-0134",
+        "+1 (212) 555-0134",
+        "1 212 555 0134",
+        "212.555.0134",
+      ]) {
+        expect(leadSchema.safeParse({ name: "A", phone }).success).toBe(true);
+      }
     });
 
     it("accepts a lead with only an email", () => {
@@ -48,7 +67,7 @@ describe("validation schemas", () => {
     });
 
     it("rejects an empty name", () => {
-      expect(leadSchema.safeParse({ name: "", phone: "1" }).success).toBe(false);
+      expect(leadSchema.safeParse({ name: "", phone: "2125550134" }).success).toBe(false);
     });
 
     it("rejects an invalid email format", () => {
@@ -57,16 +76,16 @@ describe("validation schemas", () => {
 
     it("rejects an unknown interest value", () => {
       expect(
-        leadSchema.safeParse({ name: "A", phone: "1", interest: "bogus" }).success,
+        leadSchema.safeParse({ name: "A", phone: "2125550134", interest: "bogus" }).success,
       ).toBe(false);
     });
 
     it("accepts an empty interest (placeholder not selected)", () => {
-      expect(leadSchema.safeParse({ name: "A", phone: "1", interest: "" }).success).toBe(true);
+      expect(leadSchema.safeParse({ name: "A", phone: "2125550134", interest: "" }).success).toBe(true);
     });
 
     it("rejects non-positive car_id", () => {
-      expect(leadSchema.safeParse({ car_id: 0, name: "a", phone: "1" }).success).toBe(false);
+      expect(leadSchema.safeParse({ car_id: 0, name: "a", phone: "2125550134" }).success).toBe(false);
     });
   });
 

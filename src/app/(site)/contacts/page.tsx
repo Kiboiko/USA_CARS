@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Contacts",
-  description: "Get in touch with USA Auto Sales — phone, email, and address.",
+  description: "Get in touch with Pro AutoHub — phone, email, and address.",
 };
 
 export default function ContactsPage() {
@@ -16,19 +16,19 @@ export default function ContactsPage() {
 
       <h2>Phone</h2>
       <p>
-        <a href="tel:+15551234567">+1 (555) 123-4567</a> — Mon–Sat, 9:00–19:00
+        <a href="tel:+18507134077">+1 850-713-4077</a> — Mon–Sat, 9:00–19:00
       </p>
 
       <h2>Email</h2>
       <p>
-        <a href="mailto:sales@usa-auto.example">sales@usa-auto.example</a>
+        <a href="mailto:sales@pro-autohub.com">sales@pro-autohub.com</a>
       </p>
 
       <h2>Showroom</h2>
       <p>
-        1200 Auto Plaza Dr,
+        41239 US-27,
         <br />
-        Springfield, IL 62704, USA
+        Davenport, FL 33837, USA
       </p>
 
       <p style={{ marginTop: 24, color: "var(--muted)" }}>

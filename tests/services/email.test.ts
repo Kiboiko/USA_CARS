@@ -3,6 +3,8 @@ import {
   buildLeadEmail,
   sendLeadEmail,
   createSmtpTransport,
+  createResendTransport,
+  createMailTransport,
   type MailTransport,
 } from "@/lib/services/email";
 import type { EmailConfig } from "@/lib/config";
@@ -93,5 +95,44 @@ describe("email service", () => {
     // so this is safe without a real SMTP server.
     const transport = createSmtpTransport(config);
     expect(typeof transport.sendMail).toBe("function");
+  });
+
+  it("createResendTransport POSTs to the Resend API", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => ({ id: "email_123" }), text: async () => "" });
+    const transport = createResendTransport({ ...config, resendApiKey: "re_test" }, fetchMock as any);
+    await transport.sendMail({ from: "a@b.io", to: "c@d.io", subject: "Hi", text: "body" });
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe("https://api.resend.com/emails");
+    expect((init as any).headers.authorization).toBe("Bearer re_test");
+    expect(JSON.parse((init as any).body)).toEqual({
+      from: "a@b.io",
+      to: ["c@d.io"],
+      subject: "Hi",
+      text: "body",
+    });
+  });
+
+  it("createResendTransport throws on a Resend API error", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: false, status: 401, text: async () => "unauthorized" });
+    const transport = createResendTransport({ ...config, resendApiKey: "bad" }, fetchMock as any);
+    await expect(
+      transport.sendMail({ from: "a", to: "b", subject: "s", text: "t" }),
+    ).rejects.toThrow(/Resend API error 401/);
+  });
+
+  it("createMailTransport routes to Resend when an API key is set", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => ({}), text: async () => "" });
+    vi.stubGlobal("fetch", fetchMock);
+    const transport = createMailTransport({ ...config, resendApiKey: "re_1" });
+    await transport.sendMail({ from: "a", to: "b", subject: "s", text: "t" });
+    expect(fetchMock).toHaveBeenCalledWith("https://api.resend.com/emails", expect.anything());
+    vi.unstubAllGlobals();
   });
 });

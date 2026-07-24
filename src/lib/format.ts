@@ -17,6 +17,19 @@ export function carTitle(c: { year: number; make: string; model: string }): stri
 }
 
 /**
+ * US / NANP phone number. Accepts common formats with an optional +1 / 1
+ * country code and space / dot / dash / paren separators, e.g.
+ *   +1 (212) 555-0134 · (212) 555-0134 · 212-555-0134 · 2125550134
+ * Enforces NANP rules: area code and exchange must start with 2–9.
+ */
+export const US_PHONE_RE =
+  /^(?:\+?1[\s.-]?)?\(?[2-9]\d{2}\)?[\s.-]?[2-9]\d{2}[\s.-]?\d{4}$/;
+
+export function isUsPhone(phone: string): boolean {
+  return US_PHONE_RE.test(phone.trim());
+}
+
+/**
  * Rough "$X/mo est." finance figure like dealership sites show — for display
  * only. Assumes ~10% down, 7.9% APR, 72 months. Not a real quote.
  */

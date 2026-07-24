@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "How USA Auto Sales collects, uses, and protects your personal data.",
+    "How Pro AutoHub collects, uses, and protects your personal data.",
 };
 
 export default function PrivacyPage() {
@@ -13,7 +13,7 @@ export default function PrivacyPage() {
       <p style={{ color: "var(--muted)" }}>Last updated: {new Date().getFullYear()}</p>
 
       <p>
-        This Privacy Policy explains how USA Auto Sales ("we", "us") collects and
+        This Privacy Policy explains how Pro AutoHub ("we", "us") collects and
         uses your personal information when you use our website and submit a
         request through our forms.
       </p>
@@ -48,13 +48,13 @@ export default function PrivacyPage() {
       <p>
         You may request access to, correction of, or deletion of your personal
         data by contacting us at{" "}
-        <a href="mailto:sales@usa-auto.example">sales@usa-auto.example</a>.
+        <a href="mailto:sales@pro-autohub.com">sales@pro-autohub.com</a>.
       </p>
 
       <h2>6. Contact</h2>
       <p>
         For any questions about this policy, email{" "}
-        <a href="mailto:sales@usa-auto.example">sales@usa-auto.example</a>.
+        <a href="mailto:sales@pro-autohub.com">sales@pro-autohub.com</a>.
       </p>
     </div>
   );

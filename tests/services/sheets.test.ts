@@ -54,7 +54,7 @@ describe("sheets service", () => {
     expect(buildLeadRow(lead, car)).toEqual([
       "2026-07-21 10:00:00",
       "Ann",
-      "+1 555",
+      "'+1 555", // leading apostrophe forces text in Google Sheets
       "ann@x.io",
       "Finance This Vehicle",
       "2019 Ford Mustang",
@@ -66,12 +66,16 @@ describe("sheets service", () => {
     expect(buildLeadRow({ ...lead, message: "", interest: "" }, null)).toEqual([
       "2026-07-21 10:00:00",
       "Ann",
-      "+1 555",
+      "'+1 555",
       "ann@x.io",
       "",
       "#5",
       "",
     ]);
+  });
+
+  it("leaves the phone cell empty (no lone apostrophe) when phone is blank", () => {
+    expect(buildLeadRow({ ...lead, phone: "" }, car)[2]).toBe("");
   });
 
   it("obtains an access token from the OAuth endpoint", async () => {

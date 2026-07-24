@@ -1,5 +1,5 @@
 /* =========================================================================
-   USA Auto Sales — US car-dealership visual system.
+   Pro AutoHub — US car-dealership visual system.
    Light, information-dense inventory look (à la cars.com / dealer sites):
    white cards on light gray, navy text, blue primary + red price/deal accents,
    left filter rail, busy cards with badges / specs / monthly estimate / CTAs.
@@ -888,6 +888,18 @@ img {
   font-size: 13px;
   font-weight: 600;
   margin: 4px 0 8px;
+}
+.avatar-monogram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--navy);
+  color: #fff;
+  font-family: var(--font-display, sans-serif);
+  font-weight: 700;
+  font-size: 30px;
+  letter-spacing: 0.02em;
+  border: none;
 }
 
 /* ---------- Footer ---------- */

@@ -35,7 +35,7 @@ export default async function HomePage() {
               </span>
             )}
             <span>
-              <b>1200</b> Auto Plaza Dr, Springfield IL
+              <b>Davenport, FL</b> — 41239 US-27
             </span>
           </div>
         </div>

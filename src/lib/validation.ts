@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isUsPhone } from "./format";
 
 /**
  * Zod schemas for request bodies. Keeping them here (not inline in routes) makes
@@ -47,7 +48,13 @@ export const leadSchema = z
   .object({
     car_id: z.coerce.number().int().positive().nullish(),
     name: z.string().trim().min(1, "name is required").max(200),
-    phone: z.string().trim().max(50).optional().default(""),
+    phone: z
+      .string()
+      .trim()
+      .max(50)
+      .optional()
+      .default("")
+      .refine((v) => v === "" || isUsPhone(v), "enter a valid US phone number"),
     email: emailField,
     // Accept a known slug or empty (placeholder not selected).
     interest: z

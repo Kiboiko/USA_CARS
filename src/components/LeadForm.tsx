@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ApiError, getLeadOptions, postLead } from "@/lib/api";
 import type { LeadOption } from "@/lib/types";
+import { isUsPhone } from "@/lib/format";
 
 // Lead form with client-side validation (TZ §2.1 / §2.4). Fields per the
 // updated §6 contract: name + phone + email + interest (dropdown) + message.
@@ -13,7 +14,6 @@ import type { LeadOption } from "@/lib/types";
 type Errors = Partial<Record<"name" | "phone" | "email", string>>;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_RE = /^[+()\-\s\d]{7,}$/;
 
 function validate(name: string, phone: string, email: string): Errors {
   const errors: Errors = {};
@@ -27,7 +27,7 @@ function validate(name: string, phone: string, email: string): Errors {
     errors.phone = "Enter a phone number or email.";
     errors.email = "Enter a phone number or email.";
   } else {
-    if (p && !PHONE_RE.test(p)) errors.phone = "Enter a valid phone number.";
+    if (p && !isUsPhone(p)) errors.phone = "Enter a valid US phone number.";
     if (e && !EMAIL_RE.test(e)) errors.email = "Enter a valid email address.";
   }
   return errors;
@@ -155,7 +155,7 @@ export default function LeadForm({
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           onBlur={() => setErrors(validate(name, phone, email))}
-          placeholder="+1 (555) 123-4567"
+          placeholder="+1 (212) 555-0134"
           autoComplete="tel"
         />
         {touched && errors.phone && (

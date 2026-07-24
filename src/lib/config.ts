@@ -7,13 +7,16 @@
  */
 
 export interface EmailConfig {
-  host: string;
-  port: number;
-  secure: boolean;
-  user: string;
-  password: string;
   from: string;
   to: string;
+  // SMTP transport (used when resendApiKey is absent).
+  host?: string;
+  port?: number;
+  secure?: boolean;
+  user?: string;
+  password?: string;
+  // Resend HTTP transport (preferred — sends over HTTPS, works where SMTP is blocked).
+  resendApiKey?: string;
 }
 
 export interface SheetsConfig {
@@ -50,11 +53,24 @@ function required(name: string): string {
 }
 
 function parseEmailConfig(): EmailConfig | null {
+  const to = optional("LEADS_EMAIL_TO");
+
+  // Preferred: Resend HTTP API (works even where outbound SMTP is blocked).
+  const resendApiKey = optional("RESEND_API_KEY");
+  if (resendApiKey) {
+    if (!to) return null; // a recipient is required
+    return {
+      from: optional("EMAIL_FROM") ?? optional("SMTP_FROM") ?? "onboarding@resend.dev",
+      to,
+      resendApiKey,
+    };
+  }
+
+  // Fallback: SMTP. If the core secrets are absent the lead flow degrades
+  // gracefully (records to DB, skips the email notification).
   const host = optional("SMTP_HOST");
   const user = optional("SMTP_USER");
   const password = optional("SMTP_PASSWORD");
-  // Email is optional: if the core secrets are absent the lead flow degrades
-  // gracefully (records to DB, skips the email notification).
   if (!host || !user || !password) return null;
 
   const port = Number(optional("SMTP_PORT") ?? "465");
@@ -65,7 +81,7 @@ function parseEmailConfig(): EmailConfig | null {
     user,
     password,
     from: optional("SMTP_FROM") ?? user,
-    to: optional("LEADS_EMAIL_TO") ?? user,
+    to: to ?? user,
   };
 }
 

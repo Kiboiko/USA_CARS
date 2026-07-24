@@ -27,15 +27,14 @@ interface FeedCar {
   mileage: number; // PLACEHOLDER
 }
 
-// Prices confirmed by the client. Mileage is still a placeholder (client has
-// not provided it) — set real mileage in the admin panel.
+// Prices and mileage confirmed by the client.
 const CARS: FeedCar[] = [
-  { folder: "2018 BMW M3 Competition", slug: "bmw-m3-competition", year: 2018, make: "BMW", model: "M3 Competition", price: 39900, mileage: 32450 },
-  { folder: "2018 BMW M550i xDrive", slug: "bmw-m550i-xdrive", year: 2018, make: "BMW", model: "M550i xDrive", price: 24900, mileage: 41200 },
-  { folder: "2018 Dodge Challenger SRT Demon", slug: "dodge-challenger-srt-demon", year: 2018, make: "Dodge", model: "Challenger SRT Demon", price: 84900, mileage: 12300 },
-  { folder: "2018 Jeep Grand Cherokee Trackhawk", slug: "jeep-grand-cherokee-trackhawk", year: 2018, make: "Jeep", model: "Grand Cherokee Trackhawk", price: 54900, mileage: 38900 },
-  { folder: "2018 Mercedes-Benz GLE63 AMG S", slug: "mercedes-gle63-amg-s", year: 2018, make: "Mercedes-Benz", model: "GLE63 AMG S", price: 29900, mileage: 44100 },
-  { folder: "2019 BMW 8 Series M850i xDrive", slug: "bmw-8-series-m850i-xdrive", year: 2019, make: "BMW", model: "8 Series M850i xDrive", price: 36900, mileage: 27600 },
+  { folder: "2018 BMW M3 Competition", slug: "bmw-m3-competition", year: 2018, make: "BMW", model: "M3 Competition", price: 39900, mileage: 51122 },
+  { folder: "2018 BMW M550i xDrive", slug: "bmw-m550i-xdrive", year: 2018, make: "BMW", model: "M550i xDrive", price: 24900, mileage: 125236 },
+  { folder: "2018 Dodge Challenger SRT Demon", slug: "dodge-challenger-srt-demon", year: 2018, make: "Dodge", model: "Challenger SRT Demon", price: 84900, mileage: 2679 },
+  { folder: "2018 Jeep Grand Cherokee Trackhawk", slug: "jeep-grand-cherokee-trackhawk", year: 2018, make: "Jeep", model: "Grand Cherokee Trackhawk", price: 54900, mileage: 34027 },
+  { folder: "2018 Mercedes-Benz GLE63 AMG S", slug: "mercedes-gle63-amg-s", year: 2018, make: "Mercedes-Benz", model: "GLE63 AMG S", price: 29900, mileage: 34153 },
+  { folder: "2019 BMW 8 Series M850i xDrive", slug: "bmw-8-series-m850i-xdrive", year: 2019, make: "BMW", model: "8 Series M850i xDrive", price: 36900, mileage: 94741 },
 ];
 
 function readDescription(folderPath: string): string {
@@ -99,7 +98,6 @@ function main(): void {
 
   db.close();
   console.log(`\nImported ${total} cars into ${config.databasePath}.`);
-  console.log("Reminder: price & mileage are placeholders — set the real values in the admin panel.");
 }
 
 main();

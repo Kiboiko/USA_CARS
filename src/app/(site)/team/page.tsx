@@ -2,33 +2,31 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Team",
-  description: "Meet the USA Auto Sales team — the people who help you buy.",
+  description: "The Pro AutoHub team — the people who inspect, price, and sell every car we list.",
 };
 
-const TEAM = [
+// Honest role-based team section (no fabricated names/photos). When the client
+// provides real staff names and photos, swap these cards for real profiles.
+const ROLES = [
   {
-    name: "Michael Reed",
-    role: "Owner & Sales Director",
-    photo: "https://picsum.photos/seed/team-michael/200/200",
-    bio: "20+ years in the US used-car market.",
+    tag: "SA",
+    role: "Sales",
+    text: "Help you find the right vehicle, answer questions, and set up a test drive — no pressure.",
   },
   {
-    name: "Sarah Collins",
-    role: "Senior Sales Consultant",
-    photo: "https://picsum.photos/seed/team-sarah/200/200",
-    bio: "Helps buyers find the right fit and financing.",
+    tag: "FN",
+    role: "Financing",
+    text: "Walk you through payment options and pre-approval with clear, upfront numbers.",
   },
   {
-    name: "David Nguyen",
-    role: "Service & Inspection Lead",
-    photo: "https://picsum.photos/seed/team-david/200/200",
-    bio: "Certified mechanic; inspects every car we list.",
+    tag: "IN",
+    role: "Inspection & Reconditioning",
+    text: "Inspect and recondition every car before it goes on the lot, so it's ready to drive.",
   },
   {
-    name: "Emily Carter",
+    tag: "CC",
     role: "Customer Care",
-    photo: "https://picsum.photos/seed/team-emily/200/200",
-    bio: "Your first point of contact for any request.",
+    text: "Your first point of contact for any request — before, during, and after the sale.",
   },
 ];
 
@@ -36,21 +34,29 @@ export default function TeamPage() {
   return (
     <div className="container prose" style={{ maxWidth: "var(--maxw)" }}>
       <h1>Our Team</h1>
-      <p style={{ maxWidth: 700 }}>
-        We're a small, dedicated team that inspects, prepares, and sells every car
-        we list. Here are the people you'll be dealing with.
+      <p style={{ maxWidth: 720 }}>
+        We&apos;re a small, hands-on team in Davenport, FL. We inspect, prepare, and
+        sell every car we list — and stay in touch after you drive off. Here&apos;s
+        who you&apos;ll be working with.
       </p>
 
       <div className="team-grid">
-        {TEAM.map((m) => (
-          <div className="team-card" key={m.name}>
-            <img className="avatar" src={m.photo} alt={m.name} />
-            <div style={{ fontWeight: 700, fontSize: 17 }}>{m.name}</div>
-            <div className="role">{m.role}</div>
-            <div style={{ color: "var(--muted)", fontSize: 14 }}>{m.bio}</div>
+        {ROLES.map((m) => (
+          <div className="team-card" key={m.role}>
+            <div className="avatar avatar-monogram" aria-hidden="true">
+              {m.tag}
+            </div>
+            <div style={{ fontWeight: 700, fontSize: 17 }}>{m.role}</div>
+            <div style={{ color: "var(--muted)", fontSize: 14, marginTop: 6 }}>{m.text}</div>
           </div>
         ))}
       </div>
+
+      <p style={{ marginTop: 24, color: "var(--muted)" }}>
+        Questions about a specific car? Call{" "}
+        <a href="tel:+18507134077">+1 850-713-4077</a> or open any listing and send
+        an inquiry — we usually reply the same day.
+      </p>
     </div>
   );
 }

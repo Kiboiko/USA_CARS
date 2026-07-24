@@ -51,7 +51,7 @@ export default function AdminLayout({
         <div className="container bar">
           <div className="tabs">
             <Link href="/admin/cars" style={{ marginRight: 8 }}>
-              <span className="admin-badge">USA Auto · Admin</span>
+              <span className="admin-badge">Pro AutoHub · Admin</span>
             </Link>
             {TABS.map((t) => (
               <Link

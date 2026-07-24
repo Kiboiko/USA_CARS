@@ -20,6 +20,11 @@
 .env
 .env*.local
 
+# GCP service-account keys — NEVER commit
+/usacars-*.json
+/secrets/
+*-*.iam.gserviceaccount.json
+
 # testing
 /coverage
 

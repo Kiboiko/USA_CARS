@@ -3,7 +3,7 @@ import type { AppConfig } from "../config";
 import { createLead, type Lead, type LeadInput } from "../db/leads";
 import { getCar } from "../db/cars";
 import {
-  createSmtpTransport,
+  createMailTransport,
   sendLeadEmail,
   type MailTransport,
 } from "./email";
@@ -42,7 +42,7 @@ export async function submitLead(
 
   let emailSent = false;
   if (config.email) {
-    const transport = deps.transport ?? createSmtpTransport(config.email);
+    const transport = deps.transport ?? createMailTransport(config.email);
     emailSent = await sendLeadEmail(transport, config.email, lead, car);
   }
 

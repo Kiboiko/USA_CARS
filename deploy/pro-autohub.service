@@ -1,0 +1,27 @@
+# systemd unit for the Next.js app. Install to /etc/systemd/system/pro-autohub.service
+# Adjust WorkingDirectory / User if you deploy elsewhere.
+#
+#   sudo cp deploy/pro-autohub.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now pro-autohub
+#   sudo systemctl status pro-autohub
+
+[Unit]
+Description=Pro AutoHub (Next.js) web app
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/pro-autohub
+# Next.js reads .env in the project dir; PORT is honored by `next start`.
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/npm run start
+Restart=always
+RestartSec=5
+# Give the process a moment to build the SQLite WAL etc. on boot.
+TimeoutStartSec=30
+
+[Install]
+WantedBy=multi-user.target
