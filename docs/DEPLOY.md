@@ -8,6 +8,19 @@
 
 > Все команды на сервере — под Ubuntu (Hostinger VPS по умолчанию Ubuntu). Если образ другой — скажи, поправим.
 
+### Быстрый путь (один скрипт)
+
+После шага 1 (DNS) можно развернуть всё одной командой на сервере — [`deploy/bootstrap.sh`](../deploy/bootstrap.sh) делает шаги 2–8 автоматически (пакеты, Node, firewall, клон, `.env` с генерацией `JWT_SECRET`, сборка, импорт каталога, systemd, nginx, HTTPS):
+
+```bash
+ssh root@2.24.101.60
+# ОДНОЙ строкой (подставь свой пароль админки и email для Let's Encrypt):
+curl -fsSL https://raw.githubusercontent.com/Kiboiko/USA_CARS/main/deploy/bootstrap.sh -o bootstrap.sh
+ADMIN_PASS='ПридумайСильныйПароль' LE_EMAIL='you@example.com' bash bootstrap.sh
+```
+
+Ниже — те же шаги вручную, если нужен контроль по одному.
+
 ---
 
 ## 0. Предпосылки (сделать один раз до деплоя)
