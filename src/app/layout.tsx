@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Roboto_Condensed } from "next/font/google";
 import "./globals.css";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import MetaPixel from "@/components/MetaPixel";
 
 // Type system — plain, readable US-dealership feel:
 // - Inter: body / UI text.
@@ -50,7 +51,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
-      <body>{children}</body>
+      <body>
+        <MetaPixel />
+        {children}
+      </body>
     </html>
   );
 }

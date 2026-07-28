@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ApiError, getLeadOptions, postLead } from "@/lib/api";
 import type { LeadOption } from "@/lib/types";
 import { isUsPhone } from "@/lib/format";
+import { trackLead } from "@/lib/fbq";
 
 // Lead form with client-side validation (TZ §2.1 / §2.4). Fields per the
 // updated §6 contract: name + phone + email + interest (dropdown) + message.
@@ -90,6 +91,7 @@ export default function LeadForm({
         message: message.trim(),
       });
       setStatus("ok");
+      trackLead(); // Meta Pixel "Lead" event on successful submission
       setName("");
       setPhone("");
       setEmail("");

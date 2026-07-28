@@ -25,6 +25,9 @@
 /secrets/
 *-*.iam.gserviceaccount.json
 
+# Server backups (contain .env secrets + DB) — NEVER commit
+/backups/
+
 # testing
 /coverage
 
