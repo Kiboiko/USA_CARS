@@ -37,9 +37,11 @@ function validate(name: string, phone: string, email: string): Errors {
 export default function LeadForm({
   carId,
   carTitle,
+  carPrice,
 }: {
   carId: number | null;
   carTitle?: string;
+  carPrice?: number;
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -91,7 +93,8 @@ export default function LeadForm({
         message: message.trim(),
       });
       setStatus("ok");
-      trackLead(); // Meta Pixel "Lead" event on successful submission
+      // Meta Pixel "Lead" event with vehicle context (shows which car in Meta).
+      trackLead({ carId, carTitle, value: carPrice });
       setName("");
       setPhone("");
       setEmail("");

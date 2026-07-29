@@ -125,7 +125,7 @@ export default async function CarPage({
           </div>
 
           <div id="inquiry">
-            <LeadForm carId={car.id} carTitle={title} />
+            <LeadForm carId={car.id} carTitle={title} carPrice={car.price} />
           </div>
         </div>
       </div>
