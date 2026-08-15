@@ -75,6 +75,8 @@ if the frontend is ever deployed separately from the backend.
 
 - `name` — **required**.
 - `phone`, `email` — both optional individually, but **at least one is required**. `email` is format-validated when present.
+  The site's own form is stricter than the API: its submit button stays disabled
+  until name, phone *and* email are all filled in and valid.
 - `interest` — optional; one of the slugs below (empty = placeholder not chosen). Fetch from `GET /api/lead-options`:
 
   | value (API) | label (UI) |

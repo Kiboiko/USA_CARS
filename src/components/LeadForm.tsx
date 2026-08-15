@@ -16,21 +16,24 @@ type Errors = Partial<Record<"name" | "phone" | "email", string>>;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/**
+ * Every field here is required: the form stays locked until name, phone and
+ * email are all filled in and well-formed. (The API itself is laxer — it
+ * accepts a lead with just one contact method — but the site asks for both.)
+ */
 function validate(name: string, phone: string, email: string): Errors {
   const errors: Errors = {};
-  if (name.trim().length < 2) {
-    errors.name = "Please enter your name.";
-  }
   const p = phone.trim();
   const e = email.trim();
-  if (!p && !e) {
-    // At least one contact method required — flag both fields.
-    errors.phone = "Enter a phone number or email.";
-    errors.email = "Enter a phone number or email.";
-  } else {
-    if (p && !isUsPhone(p)) errors.phone = "Enter a valid US phone number.";
-    if (e && !EMAIL_RE.test(e)) errors.email = "Enter a valid email address.";
-  }
+
+  if (name.trim().length < 2) errors.name = "Please enter your name.";
+
+  if (!p) errors.phone = "Enter your phone number.";
+  else if (!isUsPhone(p)) errors.phone = "Enter a valid US phone number.";
+
+  if (!e) errors.email = "Enter your email address.";
+  else if (!EMAIL_RE.test(e)) errors.email = "Enter a valid email address.";
+
   return errors;
 }
 
@@ -52,7 +55,10 @@ export default function LeadForm({
   );
   const [options, setOptions] = useState<LeadOption[]>([]);
   const [errors, setErrors] = useState<Errors>({});
-  const [touched, setTouched] = useState(false);
+  // Which fields the visitor has already left, so an error is only shown for a
+  // field they actually visited — the submit button can no longer be pressed
+  // to reveal them all at once.
+  const [touched, setTouched] = useState<Partial<Record<keyof Errors, boolean>>>({});
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">(
     "idle",
   );
@@ -74,9 +80,15 @@ export default function LeadForm({
     };
   }, []);
 
+  /** Mark a field as visited and refresh the error list for it. */
+  function blur(field: keyof Errors) {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    setErrors(validate(name, phone, email));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setTouched(true);
+    setTouched({ name: true, phone: true, email: true });
     const found = validate(name, phone, email);
     setErrors(found);
     if (Object.keys(found).length > 0) return;
@@ -100,7 +112,7 @@ export default function LeadForm({
       setEmail("");
       setInterest("");
       setMessage("");
-      setTouched(false);
+      setTouched({});
     } catch (err) {
       setStatus("error");
       setServerError(
@@ -110,6 +122,9 @@ export default function LeadForm({
       );
     }
   }
+
+  // Submit stays locked until name, phone and email are all present and valid.
+  const incomplete = Object.keys(validate(name, phone, email)).length > 0;
 
   if (status === "ok") {
     return (
@@ -137,49 +152,52 @@ export default function LeadForm({
         <div className="alert alert-err">{serverError}</div>
       )}
 
-      <div className={`field ${touched && errors.name ? "invalid" : ""}`}>
-        <label htmlFor="lead-name">Name</label>
+      <div className={`field ${touched.name && errors.name ? "invalid" : ""}`}>
+        <label htmlFor="lead-name">Name *</label>
         <input
           id="lead-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          onBlur={() => setErrors(validate(name, phone, email))}
+          onBlur={() => blur("name")}
           placeholder="John Smith"
           autoComplete="name"
+          required
         />
-        {touched && errors.name && (
+        {touched.name && errors.name && (
           <span className="err-text">{errors.name}</span>
         )}
       </div>
 
-      <div className={`field ${touched && errors.phone ? "invalid" : ""}`}>
-        <label htmlFor="lead-phone">Phone</label>
+      <div className={`field ${touched.phone && errors.phone ? "invalid" : ""}`}>
+        <label htmlFor="lead-phone">Phone *</label>
         <input
           id="lead-phone"
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          onBlur={() => setErrors(validate(name, phone, email))}
+          onBlur={() => blur("phone")}
           placeholder="+1 (212) 555-0134"
           autoComplete="tel"
+          required
         />
-        {touched && errors.phone && (
+        {touched.phone && errors.phone && (
           <span className="err-text">{errors.phone}</span>
         )}
       </div>
 
-      <div className={`field ${touched && errors.email ? "invalid" : ""}`}>
-        <label htmlFor="lead-email">Email</label>
+      <div className={`field ${touched.email && errors.email ? "invalid" : ""}`}>
+        <label htmlFor="lead-email">Email *</label>
         <input
           id="lead-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          onBlur={() => setErrors(validate(name, phone, email))}
+          onBlur={() => blur("email")}
           placeholder="you@email.com"
           autoComplete="email"
+          required
         />
-        {touched && errors.email && (
+        {touched.email && errors.email && (
           <span className="err-text">{errors.email}</span>
         )}
       </div>
@@ -214,10 +232,16 @@ export default function LeadForm({
       <button
         type="submit"
         className="btn btn-primary btn-block"
-        disabled={status === "sending"}
+        disabled={incomplete || status === "sending"}
       >
         {status === "sending" ? "Sending…" : "Send inquiry"}
       </button>
+
+      {incomplete && status !== "sending" && (
+        <p className="panel-sub" style={{ marginTop: 10, marginBottom: 0 }}>
+          Fill in your name, phone and email to enable sending.
+        </p>
+      )}
     </form>
   );
 }
