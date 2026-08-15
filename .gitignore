@@ -13,6 +13,11 @@
 # data / uploads (runtime state)
 /data/*.db
 /data/*.db-*
+/data/*.json
+
+# client-provided source material (photo archives are far past GitHub's limit)
+*.rar
+*.zip
 /public/uploads/*
 !/public/uploads/.gitkeep
 
