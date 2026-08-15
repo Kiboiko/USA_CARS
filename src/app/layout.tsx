@@ -66,21 +66,29 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
       <head>
-        {/* Meta Pixel Code */}
-        <script dangerouslySetInnerHTML={{ __html: META_PIXEL_SNIPPET }} />
-        <noscript>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
-            alt=""
-          />
-        </noscript>
+        {/*
+          Meta Pixel Code — rendered only while a pixel id is configured.
+          Ternaries, not `&&`: an empty id would render as an empty *text node*
+          here and in <body>, which breaks hydration (React error #418).
+        */}
+        {META_PIXEL_ID ? (
+          <>
+            <script dangerouslySetInnerHTML={{ __html: META_PIXEL_SNIPPET }} />
+            <noscript>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                height="1"
+                width="1"
+                style={{ display: "none" }}
+                src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+                alt=""
+              />
+            </noscript>
+          </>
+        ) : null}
       </head>
       <body>
-        <MetaPixel />
+        {META_PIXEL_ID ? <MetaPixel /> : null}
         {children}
       </body>
     </html>

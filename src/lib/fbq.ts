@@ -1,6 +1,11 @@
 // Meta (Facebook) Pixel — id + event helpers.
 
-export const META_PIXEL_ID = "1341376431311145";
+/**
+ * Meta Pixel id. Empty = pixel disabled: the base code is not rendered and the
+ * event helpers below become no-ops (they already bail out without `fbq`).
+ * To switch the pixel back on, paste the id here — nothing else to change.
+ */
+export const META_PIXEL_ID: string = "1780576339607781";
 
 declare global {
   interface Window {
