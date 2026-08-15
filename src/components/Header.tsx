@@ -26,7 +26,7 @@ export default function Header() {
     <>
       <div className="topbar">
         <div className="container topbar-inner">
-          <span className="tb-hours">Mon–Sat 9:00–19:00 · Davenport, FL</span>
+          <span className="tb-hours">Davenport, FL</span>
           <span className="tb-right">
             Sales <span className="sep">|</span>
             <a href={PHONE_HREF}>{PHONE}</a>

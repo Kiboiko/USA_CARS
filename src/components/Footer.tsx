@@ -29,7 +29,6 @@ export default function Footer() {
           <p>41239 US-27<br />Davenport, FL 33837</p>
           <p><a href="tel:+18507134077">+1 850-713-4077</a></p>
           <p><a href="mailto:sales@pro-autohub.com">sales@pro-autohub.com</a></p>
-          <p>Mon–Sat, 9:00–19:00</p>
         </div>
       </div>
       <div className="container footer-legal">

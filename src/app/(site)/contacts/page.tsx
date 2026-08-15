@@ -16,7 +16,7 @@ export default function ContactsPage() {
 
       <h2>Phone</h2>
       <p>
-        <a href="tel:+18507134077">+1 850-713-4077</a> — Mon–Sat, 9:00–19:00
+        <a href="tel:+18507134077">+1 850-713-4077</a>
       </p>
 
       <h2>Email</h2>
