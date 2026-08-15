@@ -50,47 +50,18 @@ export default async function CarPage({
         <Link href="/">Inventory</Link> &nbsp;/&nbsp; Used {car.make} &nbsp;/&nbsp; {title}
       </nav>
 
+      {/*
+        Three blocks placed by grid area (see .detail in globals.css): on desktop
+        the photos sit above the description with the inquiry column beside them;
+        on mobile they stack photos → inquiry → description, so the form is the
+        first thing after the gallery instead of being pushed below the text.
+      */}
       <div className="detail">
-        <div>
+        <div className="vdp-media">
           <Gallery photos={car.photos} alt={title} />
-
-          <div style={{ marginTop: 24 }}>
-            <h2 className="block-title">Vehicle overview</h2>
-            <p className="desc">{car.description}</p>
-          </div>
-
-          <div style={{ marginTop: 24 }}>
-            <h2 className="block-title">Specifications</h2>
-            <div className="specs" style={{ borderRadius: "var(--radius)" }}>
-              <div className="row">
-                <span className="k">Make</span>
-                <span className="v">{car.make}</span>
-              </div>
-              <div className="row">
-                <span className="k">Model</span>
-                <span className="v">{car.model}</span>
-              </div>
-              <div className="row">
-                <span className="k">Year</span>
-                <span className="v">{car.year}</span>
-              </div>
-              <div className="row">
-                <span className="k">Mileage</span>
-                <span className="v">{formatMileage(car.mileage)}</span>
-              </div>
-              <div className="row">
-                <span className="k">Stock #</span>
-                <span className="v">{stock}</span>
-              </div>
-              <div className="row">
-                <span className="k">VIN</span>
-                <span className="v">Available on request</span>
-              </div>
-            </div>
-          </div>
         </div>
 
-        <div>
+        <div className="vdp-aside">
           <h1 className="vdp-title">{title}</h1>
           <p className="vdp-sub">
             Stock #{stock} · {formatMileage(car.mileage)} · Used
@@ -126,6 +97,43 @@ export default async function CarPage({
 
           <div id="inquiry">
             <LeadForm carId={car.id} carTitle={title} carPrice={car.price} />
+          </div>
+        </div>
+
+        <div className="vdp-info">
+          <div>
+            <h2 className="block-title">Specifications</h2>
+            <div className="specs" style={{ borderRadius: "var(--radius)" }}>
+              <div className="row">
+                <span className="k">Make</span>
+                <span className="v">{car.make}</span>
+              </div>
+              <div className="row">
+                <span className="k">Model</span>
+                <span className="v">{car.model}</span>
+              </div>
+              <div className="row">
+                <span className="k">Year</span>
+                <span className="v">{car.year}</span>
+              </div>
+              <div className="row">
+                <span className="k">Mileage</span>
+                <span className="v">{formatMileage(car.mileage)}</span>
+              </div>
+              <div className="row">
+                <span className="k">Stock #</span>
+                <span className="v">{stock}</span>
+              </div>
+              <div className="row">
+                <span className="k">VIN</span>
+                <span className="v">Available on request</span>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 24 }}>
+            <h2 className="block-title">Vehicle overview</h2>
+            <p className="desc">{car.description}</p>
           </div>
         </div>
       </div>

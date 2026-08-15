@@ -596,12 +596,29 @@ img {
 .breadcrumb a:hover {
   color: var(--brand);
 }
+/*
+  Vehicle page layout. Placement is by grid area rather than DOM order, so the
+  same markup gives: desktop — photos over the description with the inquiry
+  column alongside; mobile — photos, then the inquiry block, then the text.
+*/
 .detail {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
+  grid-template-areas:
+    "media aside"
+    "info  aside";
   gap: 28px;
   padding: 8px 0 40px;
   align-items: start;
+}
+.vdp-media {
+  grid-area: media;
+}
+.vdp-aside {
+  grid-area: aside;
+}
+.vdp-info {
+  grid-area: info;
 }
 .gallery .main {
   aspect-ratio: 4 / 3;
@@ -738,6 +755,8 @@ img {
 .desc {
   color: var(--text);
   margin-top: 6px;
+  /* Descriptions are stored as plain text; keep the client's paragraph breaks. */
+  white-space: pre-line;
 }
 .block-title {
   font-family: var(--font-display, sans-serif);
@@ -1141,8 +1160,13 @@ table.data td.wrap {
   }
 }
 @media (max-width: 860px) {
+  /* Single column: photos → price + inquiry form → description + specs. */
   .detail {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "media"
+      "aside"
+      "info";
   }
 }
 @media (max-width: 640px) {
