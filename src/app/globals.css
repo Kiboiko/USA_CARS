@@ -880,6 +880,27 @@ img {
 .prose a:hover {
   text-decoration: underline;
 }
+
+/* Embedded showroom map (contacts page). */
+.map-embed {
+  margin: 10px 0 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  background: var(--surface-2);
+}
+.map-embed iframe {
+  display: block;
+  width: 100%;
+  height: 380px;
+  border: 0;
+}
+@media (max-width: 640px) {
+  .map-embed iframe {
+    height: 260px;
+  }
+}
 .team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));

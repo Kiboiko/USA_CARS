@@ -5,6 +5,13 @@ export const metadata: Metadata = {
   description: "Get in touch with Pro AutoHub — phone, email, and address.",
 };
 
+const ADDRESS = "41239 US-27, Davenport, FL 33837";
+// Keyless Google Maps embed — no API key or billing account needed.
+// `hl=en` pins the map labels to English — Google otherwise localises them
+// by the visitor's IP, which put Cyrillic labels on an English-only site.
+const MAP_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent(ADDRESS)}&z=15&hl=en&output=embed`;
+const MAP_DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ADDRESS)}`;
+
 export default function ContactsPage() {
   return (
     <div className="container prose">
@@ -29,6 +36,21 @@ export default function ContactsPage() {
         41239 US-27,
         <br />
         Davenport, FL 33837, USA
+      </p>
+
+      <div className="map-embed">
+        <iframe
+          src={MAP_EMBED}
+          title={`Pro AutoHub showroom — ${ADDRESS}`}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
+        />
+      </div>
+      <p>
+        <a href={MAP_DIRECTIONS} target="_blank" rel="noopener noreferrer">
+          Get directions →
+        </a>
       </p>
 
       <p style={{ marginTop: 24, color: "var(--muted)" }}>
