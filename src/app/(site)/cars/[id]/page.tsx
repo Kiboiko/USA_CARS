@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import CarViewContent from "@/components/CarViewContent";
 import Gallery from "@/components/Gallery";
 import LeadForm from "@/components/LeadForm";
 import { getCarServer } from "@/lib/server-api";
@@ -46,6 +47,9 @@ export default async function CarPage({
 
   return (
     <div className="container">
+      {/* Meta Pixel: reports this car and its price as a ViewContent. */}
+      <CarViewContent carId={car.id} carTitle={title} price={car.price} />
+
       <nav className="breadcrumb">
         <Link href="/">Inventory</Link> &nbsp;/&nbsp; Used {car.make} &nbsp;/&nbsp; {title}
       </nav>

@@ -106,7 +106,14 @@ export default function LeadForm({
       });
       setStatus("ok");
       // Meta Pixel "Lead" event with vehicle context (shows which car in Meta).
-      trackLead({ carId, carTitle, value: carPrice });
+      // The contact details go with it as advanced matching — the pixel hashes
+      // them with SHA-256 in the browser, so Meta never receives them in clear.
+      trackLead({
+        carId,
+        carTitle,
+        value: carPrice,
+        user: { name: name.trim(), phone: phone.trim(), email: email.trim() },
+      });
       setName("");
       setPhone("");
       setEmail("");
