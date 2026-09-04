@@ -29,7 +29,7 @@ afterEach(() => {
 
 describe("META_PIXEL_ID", () => {
   it("is the pixel the client provided", () => {
-    expect(META_PIXEL_ID).toBe("1608436574293588");
+    expect(META_PIXEL_ID).toBe("28353475247627159");
   });
 });
 

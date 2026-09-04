@@ -5,7 +5,7 @@
  * event helpers below become no-ops (they already bail out without `fbq`).
  * To switch the pixel back on, paste the id here — nothing else to change.
  */
-export const META_PIXEL_ID: string = "1608436574293588";
+export const META_PIXEL_ID: string = "28353475247627159";
 
 declare global {
   interface Window {
