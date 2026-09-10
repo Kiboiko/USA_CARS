@@ -3,7 +3,7 @@ import {
   META_PIXEL_ID,
   buildMatching,
   identify,
-  trackLead,
+  trackLeadSubmission,
   trackPageView,
   trackViewContent,
 } from "@/lib/fbq";
@@ -29,7 +29,7 @@ afterEach(() => {
 
 describe("META_PIXEL_ID", () => {
   it("is the pixel the client provided", () => {
-    expect(META_PIXEL_ID).toBe("28353475247627159");
+    expect(META_PIXEL_ID).toBe("2129720331271665");
   });
 });
 
@@ -94,38 +94,42 @@ describe("identify", () => {
   });
 });
 
-describe("trackLead", () => {
-  it("sends vehicle context and the car price", () => {
-    trackLead({ carId: 32, carTitle: "2022 Ram 1500 TRX", value: 59990 });
+describe("trackLeadSubmission", () => {
+  const ram = {
+    content_type: "vehicle",
+    content_name: "2022 Ram 1500 TRX",
+    content_ids: ["32"],
+    value: 59990,
+    currency: "USD",
+  };
+
+  it("sends Lead and Purchase, both with the car and its price", () => {
+    trackLeadSubmission({ carId: 32, carTitle: "2022 Ram 1500 TRX", value: 59990 });
     expect(calls).toEqual([
-      [
-        "track",
-        "Lead",
-        {
-          content_type: "vehicle",
-          content_name: "2022 Ram 1500 TRX",
-          content_ids: ["32"],
-          value: 59990,
-          currency: "USD",
-        },
-      ],
+      ["track", "Lead", ram],
+      ["track", "Purchase", ram],
     ]);
   });
 
-  it("identifies the visitor before the event so the Lead carries the match", () => {
-    trackLead({
+  it("identifies the visitor first so both events carry the match", () => {
+    trackLeadSubmission({
       carId: 1,
       carTitle: "Car",
       value: 100,
       user: { name: "Ann Lee", phone: "2125550134", email: "a@x.io" },
     });
-    expect(calls.map((c) => c[0])).toEqual(["init", "track"]);
+    expect(calls.map((c) => c.slice(0, 2))).toEqual([
+      ["init", META_PIXEL_ID],
+      ["track", "Lead"],
+      ["track", "Purchase"],
+    ]);
     expect(calls[0][2]).toMatchObject({ em: "a@x.io", ph: "12125550134" });
   });
 
   it("drops value and currency when the price is missing or zero", () => {
-    trackLead({ carId: 7, carTitle: "Car", value: 0 });
-    trackLead({ carId: 7, carTitle: "Car" });
+    trackLeadSubmission({ carId: 7, carTitle: "Car", value: 0 });
+    trackLeadSubmission({ carId: 7, carTitle: "Car" });
+    expect(calls).toHaveLength(4);
     for (const call of calls) {
       expect(call[2]).not.toHaveProperty("value");
       expect(call[2]).not.toHaveProperty("currency");
@@ -157,7 +161,7 @@ describe("without the pixel script", () => {
     (globalThis as { window?: unknown }).window = {}; // fbevents.js blocked
     expect(() => {
       identify({ email: "a@x.io" });
-      trackLead({ carId: 1, value: 10 });
+      trackLeadSubmission({ carId: 1, value: 10 });
       trackViewContent({ carId: 1, value: 10 });
       trackPageView();
     }).not.toThrow();
@@ -168,7 +172,7 @@ describe("without the pixel script", () => {
     delete (globalThis as { window?: unknown }).window;
     expect(() => {
       trackPageView();
-      trackLead({ carId: 1 });
+      trackLeadSubmission({ carId: 1 });
     }).not.toThrow();
   });
 });

@@ -5,7 +5,7 @@
  * event helpers below become no-ops (they already bail out without `fbq`).
  * To switch the pixel back on, paste the id here — nothing else to change.
  */
-export const META_PIXEL_ID: string = "28353475247627159";
+export const META_PIXEL_ID: string = "2129720331271665";
 
 declare global {
   interface Window {
@@ -64,7 +64,7 @@ export function buildMatching(user: UserData): Record<string, string> {
  * to pass on page load — the site has no accounts, so a visitor is anonymous
  * until they fill in the lead form. This runs the moment they do. `init` sends
  * no event of its own; the details ride along with every event fired after it,
- * starting with the Lead below.
+ * starting with the Lead and Purchase below.
  */
 export function identify(user: UserData): void {
   const fbq = pixel();
@@ -87,7 +87,7 @@ export interface CarEventParams {
 }
 
 export interface LeadEventParams extends CarEventParams {
-  /** Contact details, used for advanced matching before the event is sent. */
+  /** Contact details, used for advanced matching before the events are sent. */
   user?: UserData;
 }
 
@@ -104,20 +104,26 @@ function carPayload(params: CarEventParams): Record<string, unknown> {
 }
 
 /**
- * Fire the standard "Lead" event with vehicle context, so each lead in Meta
- * Events Manager shows which car it came from (content_name / content_ids) and
- * what that car costs. Called on successful lead-form submission.
+ * Report a successful lead-form submission — the one conversion this site has.
+ *
+ * It goes out as two standard events with the same vehicle context and price:
+ * "Lead", and "Purchase", which the client asked for so campaigns can optimise
+ * on it and on its value. Nothing is bought on the site — cars are sold at the
+ * showroom — so the Purchase value is the price of the car enquired about.
+ * Meta expects value and currency on every Purchase; all listings are priced,
+ * and carPayload adds both whenever the price is positive.
  */
-export function trackLead(params: LeadEventParams = {}): void {
+export function trackLeadSubmission(params: LeadEventParams = {}): void {
   const fbq = pixel();
   if (!fbq) return;
   if (params.user) identify(params.user);
   fbq("track", "Lead", carPayload(params));
+  fbq("track", "Purchase", carPayload(params));
 }
 
 /**
  * Fire "ViewContent" when a visitor opens a car listing, carrying that car's
- * price. This is what puts every car's value in front of Meta — a Lead only
+ * price. This is what puts every car's value in front of Meta — a lead only
  * reports the handful of cars people actually enquire about.
  */
 export function trackViewContent(params: CarEventParams): void {

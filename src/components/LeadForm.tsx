@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ApiError, getLeadOptions, postLead } from "@/lib/api";
 import type { LeadOption } from "@/lib/types";
 import { isUsPhone } from "@/lib/format";
-import { trackLead } from "@/lib/fbq";
+import { trackLeadSubmission } from "@/lib/fbq";
 
 // Lead form with client-side validation (TZ §2.1 / §2.4). Fields per the
 // updated §6 contract: name + phone + email + interest (dropdown) + message.
@@ -105,10 +105,10 @@ export default function LeadForm({
         message: message.trim(),
       });
       setStatus("ok");
-      // Meta Pixel "Lead" event with vehicle context (shows which car in Meta).
-      // The contact details go with it as advanced matching — the pixel hashes
+      // Meta Pixel "Lead" + "Purchase" with vehicle context and the car's price.
+      // The contact details go with them as advanced matching — the pixel hashes
       // them with SHA-256 in the browser, so Meta never receives them in clear.
-      trackLead({
+      trackLeadSubmission({
         carId,
         carTitle,
         value: carPrice,
