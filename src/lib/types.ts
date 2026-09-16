@@ -23,6 +23,9 @@ export interface CarDetail {
   mileage: number;
   description: string;
   photos: string[];
+  // A sold car still resolves at its own URL (existing links, ad clicks) but
+  // is left out of GET /api/cars, so it never appears in the CarListItem shape.
+  sold: boolean;
 }
 
 /** POST /api/leads body */
@@ -68,6 +71,7 @@ export interface CarInput {
   mileage: number;
   description: string;
   photos: string[];
+  sold: boolean;
 }
 
 export interface LoginInput {

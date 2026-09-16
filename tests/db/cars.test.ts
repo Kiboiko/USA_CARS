@@ -34,6 +34,7 @@ describe("cars repository", () => {
     expect(car.mileage).toBe(0);
     expect(car.description).toBe("");
     expect(car.photos).toEqual([]);
+    expect(car.sold).toBe(false);
   });
 
   it("returns null for a missing car", () => {
@@ -62,6 +63,33 @@ describe("cars repository", () => {
     const first = list.find((c) => c.id === a.id)!;
     expect(first.photos).toEqual(["/1.jpg"]);
     expect(first.description).toBe("d1");
+  });
+
+  it("leaves a sold car out of the public list but not out of listCarsDetail", () => {
+    const forSale = seedCar(db, { make: "ForSale" });
+    const sold = seedCar(db, { make: "Sold", sold: true });
+
+    const publicList = listCars(db);
+    expect(publicList.map((c) => c.id)).toEqual([forSale.id]);
+
+    const adminList = listCarsDetail(db);
+    expect(adminList.map((c) => c.id).sort()).toEqual([forSale.id, sold.id].sort());
+    expect(adminList.find((c) => c.id === sold.id)!.sold).toBe(true);
+    expect(adminList.find((c) => c.id === forSale.id)!.sold).toBe(false);
+  });
+
+  it("still returns a sold car by id, so its own page keeps working", () => {
+    const car = seedCar(db, { sold: true });
+    expect(getCar(db, car.id)!.sold).toBe(true);
+  });
+
+  it("updateCar can flip sold in either direction", () => {
+    const car = seedCar(db);
+    expect(car.sold).toBe(false);
+    const soldNow = updateCar(db, car.id, { ...car, sold: true });
+    expect(soldNow!.sold).toBe(true);
+    const availableAgain = updateCar(db, car.id, { ...car, sold: false });
+    expect(availableAgain!.sold).toBe(false);
   });
 
   it("updates a car and bumps nothing it shouldn't", () => {

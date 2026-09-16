@@ -36,6 +36,7 @@ const car: Car = {
   mileage: 41000,
   description: "",
   photos: [],
+  sold: false,
   created_at: "",
   updated_at: "",
 };

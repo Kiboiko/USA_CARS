@@ -38,4 +38,26 @@ describe("db connection", () => {
     resetDb();
     expect(() => resetDb()).not.toThrow();
   });
+
+  it("adds the sold column to a database file created before it existed", () => {
+    const dir = mkdtempSync(join(tmpdir(), "usacars-migrate-"));
+    const path = join(dir, "legacy.db");
+
+    // Simulate a database from before the "sold" column was introduced.
+    const legacy = createDatabase(path);
+    legacy.exec("ALTER TABLE cars DROP COLUMN sold");
+    legacy.exec("INSERT INTO cars (make, model, year, price) VALUES ('A','B',2020,1)");
+    legacy.close();
+
+    // Reopening it — what happens on the next server start — should add the
+    // column back (defaulting existing rows to not sold) without touching data.
+    const reopened = createDatabase(path);
+    const row = reopened.prepare("SELECT make, sold FROM cars").get() as {
+      make: string;
+      sold: number;
+    };
+    expect(row).toEqual({ make: "A", sold: 0 });
+    reopened.close();
+    rmSync(dir, { recursive: true, force: true });
+  });
 });

@@ -84,6 +84,7 @@ export const carSchema = z.object({
   mileage: z.coerce.number().int().min(0).optional().default(0),
   description: z.string().trim().max(20000).optional().default(""),
   photos: z.array(z.string().trim().min(1)).max(30).optional().default([]),
+  sold: z.boolean().optional().default(false),
 });
 
 export type CarPayload = z.infer<typeof carSchema>;

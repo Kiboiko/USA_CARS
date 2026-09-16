@@ -66,7 +66,10 @@ export default async function CarPage({
         </div>
 
         <div className="vdp-aside">
-          <h1 className="vdp-title">{title}</h1>
+          <h1 className="vdp-title">
+            {car.sold && <span className="badge sold" style={{ marginRight: 8 }}>Sold</span>}
+            {title}
+          </h1>
           <p className="vdp-sub">
             Stock #{stock} · {formatMileage(car.mileage)} · Used
           </p>
@@ -77,21 +80,31 @@ export default async function CarPage({
                 <div className="price-label">Our price</div>
                 <div className="pc-price">{formatPrice(car.price)}</div>
               </div>
-              <div className="price-mo">
-                <b>${estMonthly(car.price).toLocaleString("en-US")}/mo</b>
-                est.*
-              </div>
+              {!car.sold && (
+                <div className="price-mo">
+                  <b>${estMonthly(car.price).toLocaleString("en-US")}/mo</b>
+                  est.*
+                </div>
+              )}
             </div>
             <div className="pc-cta">
-              <a href="#inquiry" className="btn btn-deal btn-block">
-                Get ePrice
-              </a>
-              <a href="#inquiry" className="btn btn-primary btn-block">
-                Check availability
-              </a>
-              <a href="tel:+18507134077" className="btn btn-block">
-                ☎ Call about this car
-              </a>
+              {car.sold ? (
+                <a href="tel:+18507134077" className="btn btn-primary btn-block">
+                  ☎ Ask about similar vehicles
+                </a>
+              ) : (
+                <>
+                  <a href="#inquiry" className="btn btn-deal btn-block">
+                    Get ePrice
+                  </a>
+                  <a href="#inquiry" className="btn btn-primary btn-block">
+                    Check availability
+                  </a>
+                  <a href="tel:+18507134077" className="btn btn-block">
+                    ☎ Call about this car
+                  </a>
+                </>
+              )}
             </div>
             <p className="pc-fine">
               *Estimated payment: 10% down, 7.9% APR, 72 mo. On approved credit;
@@ -99,9 +112,19 @@ export default async function CarPage({
             </p>
           </div>
 
-          <div id="inquiry">
-            <LeadForm carId={car.id} carTitle={title} carPrice={car.price} />
-          </div>
+          {car.sold ? (
+            <div className="panel" role="status">
+              <h3>This vehicle has been sold</h3>
+              <p className="panel-sub">
+                It&apos;s no longer available, but our inventory changes often —
+                call us and we&apos;ll help you find something similar.
+              </p>
+            </div>
+          ) : (
+            <div id="inquiry">
+              <LeadForm carId={car.id} carTitle={title} carPrice={car.price} />
+            </div>
+          )}
         </div>
 
         <div className="vdp-info">

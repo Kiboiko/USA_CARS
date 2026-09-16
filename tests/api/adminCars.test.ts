@@ -97,6 +97,22 @@ describe("admin cars — CRUD", () => {
     expect(getCar(getDb(), car.id)!.make).toBe("Updated");
   });
 
+  it("marks a car sold and back to available through PUT", async () => {
+    const car = seedCar(getDb());
+    const markSold = await putAdminCar(
+      jsonRequest("http://t/", "PUT", { ...validCar, sold: true }, authHeader(token)),
+      ctx(String(car.id)),
+    );
+    expect((await markSold.json()).sold).toBe(true);
+    expect(getCar(getDb(), car.id)!.sold).toBe(true);
+
+    const markAvailable = await putAdminCar(
+      jsonRequest("http://t/", "PUT", { ...validCar, sold: false }, authHeader(token)),
+      ctx(String(car.id)),
+    );
+    expect((await markAvailable.json()).sold).toBe(false);
+  });
+
   it("returns 404 when updating a missing car", async () => {
     const res = await putAdminCar(
       jsonRequest("http://t/", "PUT", validCar, authHeader(token)),

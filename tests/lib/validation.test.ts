@@ -107,6 +107,18 @@ describe("validation schemas", () => {
       expect(parsed.price).toBe(1000);
       expect(parsed.mileage).toBe(0);
       expect(parsed.photos).toEqual([]);
+      expect(parsed.sold).toBe(false);
+    });
+
+    it("accepts an explicit sold flag", () => {
+      const parsed = carSchema.parse({
+        make: "Ford",
+        model: "F",
+        year: 2020,
+        price: 1000,
+        sold: true,
+      });
+      expect(parsed.sold).toBe(true);
     });
 
     it("rejects out-of-range years", () => {

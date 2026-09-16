@@ -10,6 +10,8 @@ export interface Car {
   mileage: number;
   description: string;
   photos: string[];
+  /** Hides the car from the public inventory (list + sitemap) once true. */
+  sold: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -23,9 +25,10 @@ export interface CarInput {
   mileage?: number;
   description?: string;
   photos?: string[];
+  sold?: boolean;
 }
 
-/** List item shape for `GET /api/cars` (ТЗ §6). */
+/** List item shape for `GET /api/cars` (ТЗ §6). Sold cars never appear here. */
 export interface CarListItem {
   id: number;
   make: string;
@@ -45,6 +48,7 @@ interface CarRow {
   mileage: number;
   description: string;
   photos: string;
+  sold: number;
   created_at: string;
   updated_at: string;
 }
@@ -59,14 +63,20 @@ function parsePhotos(raw: string): string[] {
 }
 
 function mapRow(row: CarRow): Car {
-  return { ...row, photos: parsePhotos(row.photos) };
+  return { ...row, photos: parsePhotos(row.photos), sold: !!row.sold };
 }
 
-/** List all cars, newest first, in the public list-item shape. */
+/**
+ * List cars in stock, newest first, in the public list-item shape. A sold car
+ * is left out entirely — this is what drops it from the home page grid and
+ * the sitemap without either needing to know about "sold" at all.
+ */
 export function listCars(db: Db): CarListItem[] {
   const rows = db
-    .prepare("SELECT id, make, model, year, price, mileage, photos FROM cars ORDER BY created_at DESC, id DESC")
-    .all() as Array<Omit<CarRow, "description" | "created_at" | "updated_at">>;
+    .prepare(
+      "SELECT id, make, model, year, price, mileage, photos FROM cars WHERE sold = 0 ORDER BY created_at DESC, id DESC",
+    )
+    .all() as Array<Omit<CarRow, "description" | "sold" | "created_at" | "updated_at">>;
   return rows.map((row) => {
     const photos = parsePhotos(row.photos);
     return {
@@ -103,8 +113,8 @@ export function getCar(db: Db, id: number): Car | null {
 export function createCar(db: Db, input: CarInput): Car {
   const result = db
     .prepare(
-      `INSERT INTO cars (make, model, year, price, mileage, description, photos)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO cars (make, model, year, price, mileage, description, photos, sold)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .run(
       input.make,
@@ -114,6 +124,7 @@ export function createCar(db: Db, input: CarInput): Car {
       input.mileage ?? 0,
       input.description ?? "",
       JSON.stringify(input.photos ?? []),
+      input.sold ? 1 : 0,
     );
   const created = getCar(db, Number(result.lastInsertRowid));
   if (!created) throw new Error("Failed to load car after insert");
@@ -126,7 +137,7 @@ export function updateCar(db: Db, id: number, input: CarInput): Car | null {
   if (!existing) return null;
   db.prepare(
     `UPDATE cars
-       SET make = ?, model = ?, year = ?, price = ?, mileage = ?, description = ?, photos = ?,
+       SET make = ?, model = ?, year = ?, price = ?, mileage = ?, description = ?, photos = ?, sold = ?,
            updated_at = datetime('now')
      WHERE id = ?`,
   ).run(
@@ -137,6 +148,7 @@ export function updateCar(db: Db, id: number, input: CarInput): Car | null {
     input.mileage ?? 0,
     input.description ?? "",
     JSON.stringify(input.photos ?? []),
+    input.sold ? 1 : 0,
     id,
   );
   return getCar(db, id);

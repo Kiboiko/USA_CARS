@@ -23,6 +23,7 @@ export default function CarFormModal({ token, initial, onClose, onSave }: Props)
   const [mileage, setMileage] = useState(String(initial?.mileage ?? ""));
   const [description, setDescription] = useState(initial?.description ?? "");
   const [photos, setPhotos] = useState<string[]>(initial?.photos ?? []);
+  const [sold, setSold] = useState(initial?.sold ?? false);
   const [errors, setErrors] = useState<Errors>({});
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -75,6 +76,7 @@ export default function CarFormModal({ token, initial, onClose, onSave }: Props)
         mileage: Number(mileage) || 0,
         description: description.trim(),
         photos,
+        sold,
       });
     } catch {
       setServerError("Could not save. Please try again.");
@@ -132,6 +134,15 @@ export default function CarFormModal({ token, initial, onClose, onSave }: Props)
                 />
               </div>
             </div>
+
+            <label className="check" style={{ marginTop: 4 }}>
+              <input
+                type="checkbox"
+                checked={sold}
+                onChange={(e) => setSold(e.target.checked)}
+              />
+              Sold — hide from the public inventory
+            </label>
 
             <div className="field">
               <label>Description</label>

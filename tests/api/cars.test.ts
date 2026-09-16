@@ -29,6 +29,15 @@ describe("GET /api/cars", () => {
     expect(body[0]).toMatchObject({ make: "Kia", photo_cover: "/k.jpg" });
     expect(body[0]).not.toHaveProperty("description");
   });
+
+  it("leaves a sold car out of the public list", async () => {
+    seedCar(getDb(), { make: "Available" });
+    seedCar(getDb(), { make: "Gone", sold: true });
+    const res = await listCarsRoute();
+    const body = await res.json();
+    expect(body).toHaveLength(1);
+    expect(body[0]).toMatchObject({ make: "Available" });
+  });
 });
 
 describe("GET /api/cars/:id", () => {
@@ -49,5 +58,13 @@ describe("GET /api/cars/:id", () => {
   it("returns 400 for a non-numeric id", async () => {
     const res = await getCarRoute(new Request("http://t/"), ctx("abc"));
     expect(res.status).toBe(400);
+  });
+
+  it("still resolves a sold car by id — its own page keeps working", async () => {
+    const car = seedCar(getDb(), { sold: true });
+    const res = await getCarRoute(new Request("http://t/"), ctx(String(car.id)));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.sold).toBe(true);
   });
 });

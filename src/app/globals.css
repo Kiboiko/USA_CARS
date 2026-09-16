@@ -467,6 +467,10 @@ img {
 .badge.certified {
   background: var(--ok);
 }
+.badge.sold {
+  background: var(--deal);
+  vertical-align: middle;
+}
 .photo-count {
   position: absolute;
   right: 10px;

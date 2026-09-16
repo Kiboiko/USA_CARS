@@ -21,6 +21,20 @@ const { DatabaseSync: DatabaseSyncCtor } = nodeRequire("node:sqlite") as typeof 
  */
 export type Db = DatabaseSync;
 
+/**
+ * Add columns introduced after a database was first created. `SCHEMA_SQL`
+ * uses `CREATE TABLE IF NOT EXISTS`, so it never touches a table that already
+ * exists — a column added there only reaches fresh databases (new deploys,
+ * tests) unless it is also applied here for the one already on disk.
+ */
+function runMigrations(db: Db): void {
+  const columns = db.prepare("PRAGMA table_info(cars)").all() as Array<{ name: string }>;
+  const hasSold = columns.some((c) => c.name === "sold");
+  if (!hasSold) {
+    db.exec("ALTER TABLE cars ADD COLUMN sold INTEGER NOT NULL DEFAULT 0");
+  }
+}
+
 /** Create a fresh database instance and apply the schema. */
 export function createDatabase(path: string): Db {
   if (path !== ":memory:") {
@@ -28,6 +42,7 @@ export function createDatabase(path: string): Db {
   }
   const db = new DatabaseSyncCtor(path);
   db.exec(SCHEMA_SQL);
+  runMigrations(db);
   return db;
 }
 

@@ -57,6 +57,25 @@ export default function AdminCarsPage() {
     await load();
   }
 
+  async function toggleSold(car: CarDetail) {
+    if (!token) return;
+    try {
+      const updated = await adminUpdateCar(token, car.id, {
+        make: car.make,
+        model: car.model,
+        year: car.year,
+        price: car.price,
+        mileage: car.mileage,
+        description: car.description,
+        photos: car.photos,
+        sold: !car.sold,
+      });
+      setCars((cs) => cs.map((c) => (c.id === car.id ? updated : c)));
+    } catch {
+      setError("Could not update the car.");
+    }
+  }
+
   async function handleDelete(car: CarDetail) {
     if (!token) return;
     if (!window.confirm(`Delete ${carTitle(car)}? This cannot be undone.`)) return;
@@ -105,6 +124,7 @@ export default function AdminCarsPage() {
                 <th>Price</th>
                 <th>Mileage</th>
                 <th>Photos</th>
+                <th>Status</th>
                 <th></th>
               </tr>
             </thead>
@@ -131,7 +151,17 @@ export default function AdminCarsPage() {
                   <td>{formatMileage(car.mileage)}</td>
                   <td>{car.photos.length}</td>
                   <td>
+                    {car.sold ? (
+                      <span className="tag" style={{ color: "var(--deal)" }}>Sold</span>
+                    ) : (
+                      <span className="tag">In stock</span>
+                    )}
+                  </td>
+                  <td>
                     <div className="row-actions">
+                      <button className="btn" onClick={() => toggleSold(car)}>
+                        {car.sold ? "Mark available" : "Mark sold"}
+                      </button>
                       <button className="btn" onClick={() => openEdit(car)}>
                         Edit
                       </button>

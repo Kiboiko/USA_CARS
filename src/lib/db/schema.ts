@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS cars (
   mileage     INTEGER NOT NULL DEFAULT 0,
   description TEXT    NOT NULL DEFAULT '',
   photos      TEXT    NOT NULL DEFAULT '[]', -- JSON array of photo URLs
+  sold        INTEGER NOT NULL DEFAULT 0, -- 0/1: hides the car from public inventory
   created_at  TEXT    NOT NULL DEFAULT (datetime('now')),
   updated_at  TEXT    NOT NULL DEFAULT (datetime('now'))
 );
