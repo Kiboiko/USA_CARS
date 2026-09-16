@@ -1,18 +1,20 @@
 // Server-side data fetching for Server Components. Server fetch needs an
-// absolute URL, so we resolve one from the incoming request host (or from
-// NEXT_PUBLIC_API_BASE_URL when Role 1's backend is configured).
+// absolute URL: NEXT_PUBLIC_API_BASE_URL when Role 1's backend is configured,
+// otherwise this app's own API.
 
-import { headers } from "next/headers";
 import type { CarDetail, CarListItem } from "./types";
 
+/**
+ * The API is served by this same process, so it is called on the loopback
+ * address rather than by the site's public name. Going out through the domain
+ * made every page depend on the server resolving its own name — when that
+ * lookup failed, pages still loaded but showed no cars — and cost an nginx +
+ * TLS round trip on every render.
+ */
 async function serverBase(): Promise<string> {
   const ext = process.env.NEXT_PUBLIC_API_BASE_URL;
   if (ext) return ext.replace(/\/$/, "");
-  // Next.js 15: headers() is async.
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
-  const proto = h.get("x-forwarded-proto") ?? "http";
-  return `${proto}://${host}`;
+  return `http://127.0.0.1:${process.env.PORT ?? 3000}`;
 }
 
 export async function getCarsServer(): Promise<CarListItem[]> {

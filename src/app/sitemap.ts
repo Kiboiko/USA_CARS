@@ -2,6 +2,9 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { getCarsServer } from "@/lib/server-api";
 
+// Built per request, so it lists the cars in stock now rather than at build.
+export const dynamic = "force-dynamic";
+
 // Sitemap includes the static pages plus one entry per car (TZ §2.1 SEO).
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
